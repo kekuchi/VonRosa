@@ -1,543 +1,705 @@
-import React, { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Cpu, FlaskConical, Eye, Lock, ChevronRight, AlertTriangle, Globe, Building2, Activity, ScanLine } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VonRosa — Global Archive Division</title>
+  <meta name="description" content="VonRosa — Shaping Stability Through Innovation." />
+  <style>
+    :root {
+      --bg: #06090d;
+      --bg-soft: #0b1118;
+      --card: rgba(255,255,255,0.04);
+      --card-strong: rgba(255,255,255,0.07);
+      --border: rgba(255,255,255,0.12);
+      --text: #eef6ff;
+      --muted: rgba(238,246,255,0.68);
+      --faint: rgba(238,246,255,0.38);
+      --cyan: #a6ecff;
+      --amber: #f3ca8d;
+      --emerald: #9ef2be;
+      --red: #ff9c9c;
+      --shadow: 0 20px 60px rgba(0,0,0,0.35);
+      --radius: 28px;
+    }
 
-const pages = {
-  home: {
-    title: "VonRosa",
-    subtitle: "Shaping Stability Through Innovation",
-  },
-  elixirs: {
-    title: "Bio-Elixirs Division",
-    subtitle: "Refinement. Longevity. Clarity.",
-  },
-  infrastructure: {
-    title: "Infrastructure AI",
-    subtitle: "Connected intelligence for a unified tomorrow.",
-  },
-  gss: {
-    title: "Global Stability Surveillance",
-    subtitle: "Monitoring continuity across sectors.",
-  },
-  defense: {
-    title: "Strategic Guidance Office",
-    subtitle: "Restricted division. Limited disclosure.",
-  },
-};
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(120, 210, 255, 0.13), transparent 28%),
+        linear-gradient(180deg, #0a1118 0%, #06090d 55%, #030507 100%);
+      min-height: 100vh;
+    }
 
-const navItems = [
-  { key: "home", label: "Archive" },
-  { key: "elixirs", label: "Bio-Elixirs" },
-  { key: "infrastructure", label: "Infrastructure AI" },
-  { key: "gss", label: "GSS" },
-  { key: "defense", label: "Restricted" },
-];
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
 
-const bgByPage = {
-  home:
-    "bg-[radial-gradient(circle_at_top,_rgba(152,225,255,0.15),_transparent_30%),linear-gradient(180deg,_#09111a_0%,_#05080d_55%,_#030507_100%)]",
-  elixirs:
-    "bg-[radial-gradient(circle_at_top_left,_rgba(255,199,115,0.16),_transparent_30%),linear-gradient(180deg,_#140f0a_0%,_#090705_60%,_#040302_100%)]",
-  infrastructure:
-    "bg-[radial-gradient(circle_at_top_right,_rgba(90,159,255,0.18),_transparent_28%),linear-gradient(180deg,_#081019_0%,_#050811_58%,_#030509_100%)]",
-  gss:
-    "bg-[radial-gradient(circle_at_center,_rgba(103,255,169,0.12),_transparent_30%),linear-gradient(180deg,_#07130d_0%,_#050a08_60%,_#030504_100%)]",
-  defense:
-    "bg-[radial-gradient(circle_at_top,_rgba(255,79,79,0.10),_transparent_26%),linear-gradient(180deg,_#130809_0%,_#0a0506_58%,_#050304_100%)]",
-};
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      background: rgba(4, 7, 11, 0.58);
+      border-bottom: 1px solid var(--border);
+    }
 
-function TopBar({ current, setCurrent }) {
-  return (
-    <div className="sticky top-0 z-40 border-b border-white/10 bg-black/35 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-8">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-cyan-300/20 bg-white/5 shadow-lg shadow-cyan-500/10">
-            <ScanLine className="h-5 w-5 text-cyan-200" />
-          </div>
-          <div>
-            <div className="text-lg font-semibold tracking-[0.22em] text-white">VONROSA</div>
-            <div className="text-[10px] uppercase tracking-[0.35em] text-white/45">Global Archive Division</div>
-          </div>
-        </div>
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 16px 0;
+    }
 
-        <div className="hidden items-center gap-2 md:flex">
-          {navItems.map((item) => (
-            <Button
-              key={item.key}
-              variant="ghost"
-              onClick={() => setCurrent(item.key)}
-              className={`rounded-2xl px-4 text-sm ${current === item.key ? "bg-white/10 text-white" : "text-white/60 hover:bg-white/5 hover:text-white"}`}
-            >
-              {item.label}
-            </Button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
 
-function Hero({ setCurrent }) {
-  return (
-    <section className="relative overflow-hidden px-4 py-14 md:px-8 md:py-20">
-      <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.25fr_.75fr]">
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      border: 1px solid rgba(166, 236, 255, 0.2);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      position: relative;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset, 0 8px 28px rgba(78,194,232,0.08);
+    }
+
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border: 1px solid rgba(166, 236, 255, 0.3);
+      border-radius: 50%;
+    }
+
+    .brand-mark::after {
+      inset: 18px;
+      background: rgba(166, 236, 255, 0.75);
+      border: none;
+      width: 8px;
+      height: 8px;
+      margin: auto;
+      box-shadow: 0 0 18px rgba(166,236,255,0.6);
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      letter-spacing: 0.25em;
+      font-weight: 700;
+    }
+
+    .brand-sub {
+      margin-top: 2px;
+      font-size: 0.68rem;
+      letter-spacing: 0.28em;
+      color: var(--faint);
+      text-transform: uppercase;
+    }
+
+    nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    nav a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      border: 1px solid transparent;
+      transition: 160ms ease;
+      font-size: 0.95rem;
+    }
+
+    nav a:hover {
+      color: var(--text);
+      border-color: var(--border);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .hero {
+      padding: 56px 0 28px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(166, 236, 255, 0.18);
+      background: rgba(166,236,255,0.08);
+      color: var(--cyan);
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 18px 0 0;
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      max-width: 780px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: 1.12rem;
+      line-height: 1.9;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 18px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-weight: 600;
+      transition: 160ms ease;
+      cursor: pointer;
+    }
+
+    .button:hover { transform: translateY(-1px); background: rgba(255,255,255,0.08); }
+    .button.primary { background: var(--cyan); color: #08131a; border-color: transparent; }
+    .button.primary:hover { background: #c1f3ff; }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.03));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      font-size: 0.72rem;
+    }
+
+    .panel-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .panel-row:last-child { border-bottom: 0; }
+    .panel-label { font-size: 1rem; color: var(--text); }
+    .panel-value { font-size: 0.92rem; color: var(--cyan); text-align: right; }
+
+    .section {
+      padding: 24px 0 20px;
+    }
+
+    .section-header {
+      margin-bottom: 18px;
+    }
+
+    .section-kicker {
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: 0.32em;
+      font-size: 0.72rem;
+    }
+
+    .section-title {
+      margin: 10px 0 0;
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      line-height: 1.05;
+    }
+
+    .section-copy {
+      margin: 14px 0 0;
+      max-width: 860px;
+      color: var(--muted);
+      line-height: 1.9;
+      font-size: 1.02rem;
+    }
+
+    .grid-4, .grid-3, .grid-2 {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .card {
+      border-radius: 26px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: 180ms ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      background: var(--card-strong);
+    }
+
+    .card-art {
+      aspect-ratio: 16 / 10;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-art::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.48));
+    }
+
+    .art-home {
+      background-image:
+        radial-gradient(circle at 30% 25%, rgba(185, 233, 255, 0.35), transparent 18%),
+        linear-gradient(135deg, rgba(34,43,64,0.96), rgba(7,11,17,0.7)),
+        url('https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=1200&q=80');
+    }
+
+    .art-elixir {
+      background-image:
+        radial-gradient(circle at 30% 20%, rgba(255, 211, 145, 0.42), transparent 20%),
+        linear-gradient(135deg, rgba(65,42,16,0.75), rgba(8,7,7,0.6)),
+        url('https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=1200&q=80');
+    }
+
+    .art-ai {
+      background-image:
+        radial-gradient(circle at 80% 18%, rgba(120, 187, 255, 0.35), transparent 20%),
+        linear-gradient(135deg, rgba(17,44,84,0.7), rgba(7,10,18,0.65)),
+        url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80');
+    }
+
+    .art-gss {
+      background-image:
+        radial-gradient(circle at 50% 20%, rgba(124, 255, 180, 0.22), transparent 22%),
+        linear-gradient(135deg, rgba(7,40,27,0.75), rgba(5,10,8,0.7)),
+        url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80');
+    }
+
+    .art-defense {
+      background-image:
+        radial-gradient(circle at 55% 20%, rgba(255, 129, 129, 0.18), transparent 18%),
+        linear-gradient(135deg, rgba(56,16,16,0.75), rgba(8,6,6,0.72)),
+        url('https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=1200&q=80');
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    .card-label {
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: 0.28em;
+      font-size: 0.68rem;
+    }
+
+    .card-title {
+      margin-top: 10px;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .card-copy {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.8;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .stat {
+      padding: 22px;
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .stat-label {
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      font-size: 0.7rem;
+    }
+
+    .stat-value {
+      margin-top: 12px;
+      font-size: 2.1rem;
+      font-weight: 700;
+    }
+
+    .stat-copy {
+      margin-top: 10px;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 0.94rem;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+
+    .notice {
+      border-left: 3px solid rgba(255,255,255,0.22);
+      padding-left: 14px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .pill-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .pill {
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.18);
+    }
+
+    .pill strong { display: block; font-size: 1rem; }
+    .pill span { display: block; margin-top: 8px; color: var(--muted); line-height: 1.7; font-size: 0.92rem; }
+
+    .footer {
+      padding: 26px 0 36px;
+      border-top: 1px solid var(--border);
+      margin-top: 24px;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .footer small {
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+    }
+
+    .warning {
+      color: rgba(255, 180, 180, 0.75);
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .split,
+      .grid-4,
+      .grid-3,
+      .grid-2,
+      .stats,
+      .pill-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .hero-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      nav { display: none; }
+      .grid-4,
+      .grid-3,
+      .grid-2,
+      .stats,
+      .pill-grid,
+      .split {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar-inner { padding: 14px 0; }
+      .hero { padding-top: 34px; }
+      .section { padding-top: 18px; }
+      .brand-title { font-size: 1rem; }
+      .container { width: min(1180px, calc(100% - 22px)); }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
         <div>
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <Badge className="mb-5 rounded-full border border-cyan-300/20 bg-cyan-400/10 px-4 py-1 text-cyan-100">
-              Established across sovereign sectors
-            </Badge>
-            <h1 className="max-w-4xl text-5xl font-semibold leading-tight tracking-tight text-white md:text-7xl">
-              Shaping Stability
-              <span className="block text-cyan-200/90">Through Innovation</span>
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/70 md:text-xl">
-              At VonRosa, equilibrium is not discovered. It is engineered. Through biochemical refinement,
-              adaptive intelligence systems, and cross-sector governance support, we provide the framework for a
-              more orderly global future.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button onClick={() => setCurrent("elixirs")} className="rounded-2xl bg-cyan-300 text-slate-950 hover:bg-cyan-200">
-                Explore divisions
-              </Button>
-              <Button onClick={() => setCurrent("gss")} variant="outline" className="rounded-2xl border-white/15 bg-white/5 text-white hover:bg-white/10">
-                Review public systems
-              </Button>
+          <div class="brand-title">VONROSA</div>
+          <div class="brand-sub">Global Archive Division</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#divisions">Divisions</a>
+        <a href="#elixirs">Bio-Elixirs</a>
+        <a href="#infrastructure">Infrastructure AI</a>
+        <a href="#gss">GSS</a>
+        <a href="#restricted">Restricted</a>
+        <a href="/node_7/">Node_7</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Established across sovereign sectors</div>
+          <h1>Shaping Stability Through Innovation</h1>
+          <p>
+            At VonRosa, equilibrium is not found. It is engineered. Through biochemical refinement, adaptive intelligence systems,
+            and cross-sector continuity planning, we provide nations and citizens alike with the tools necessary to thrive in a more unified future.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#divisions">Explore divisions</a>
+            <a class="button" href="#statement">Public continuity statement</a>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">Public systems overview</div>
+          <div class="panel-row">
+            <div class="panel-label">Biochemical refinement</div>
+            <div class="panel-value">Operational across 16 sectors</div>
+          </div>
+          <div class="panel-row">
+            <div class="panel-label">Infrastructure cognition</div>
+            <div class="panel-value">Integrated into civic networks</div>
+          </div>
+          <div class="panel-row">
+            <div class="panel-label">Continuity oversight</div>
+            <div class="panel-value">Monitoring for optimal performance</div>
+          </div>
+          <div class="panel-row">
+            <div class="panel-label">Strategic guidance offices</div>
+            <div class="panel-value warning">Restricted public disclosure</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="divisions">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-kicker">Public divisions</div>
+          <h2 class="section-title">A polished future, sector by sector</h2>
+          <p class="section-copy">
+            VonRosa maintains an integrated portfolio spanning advanced refinement sciences, public systems intelligence, global surveillance continuity, and strategic advisory frameworks under sovereign stabilization accords.
+          </p>
+        </div>
+
+        <div class="grid-4">
+          <article class="card" id="elixirs">
+            <div class="card-art art-elixir"></div>
+            <div class="card-body">
+              <div class="card-label">Biochemical refinement</div>
+              <div class="card-title">Bio-Elixirs</div>
+              <div class="card-copy">
+                Proprietary compounds designed to enhance physiological resilience, emotional regulation, and cognitive clarity.
+              </div>
             </div>
-          </motion.div>
-        </div>
+          </article>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-        >
-          <Card className="overflow-hidden rounded-[2rem] border-white/10 bg-white/5 shadow-2xl shadow-cyan-900/20">
-            <CardContent className="p-0">
-              <div className="border-b border-white/10 bg-white/5 px-6 py-4 text-xs uppercase tracking-[0.3em] text-white/50">
-                Public Systems Overview
+          <article class="card" id="infrastructure">
+            <div class="card-art art-ai"></div>
+            <div class="card-body">
+              <div class="card-label">Civic systems intelligence</div>
+              <div class="card-title">Infrastructure AI</div>
+              <div class="card-copy">
+                Adaptive civic intelligence regulating transport, energy balancing, logistics flow, and municipal continuity in real time.
               </div>
-              <div className="grid gap-0">
-                {[
-                  ["Biochemical refinement", "Operational across 16 sectors"],
-                  ["Infrastructure cognition", "Integrated into civic networks"],
-                  ["Continuity oversight", "Monitoring for optimal performance"],
-                  ["Strategic offices", "Restricted access protocols in place"],
-                ].map(([a, b]) => (
-                  <div key={a} className="flex items-center justify-between border-b border-white/10 px-6 py-5 last:border-b-0">
-                    <div>
-                      <div className="text-sm uppercase tracking-[0.25em] text-white/40">Division</div>
-                      <div className="mt-1 text-lg text-white">{a}</div>
-                    </div>
-                    <div className="text-right text-sm text-cyan-100/80">{b}</div>
-                  </div>
-                ))}
+            </div>
+          </article>
+
+          <article class="card" id="gss">
+            <div class="card-art art-gss"></div>
+            <div class="card-body">
+              <div class="card-label">Continuity oversight</div>
+              <div class="card-title">GSS</div>
+              <div class="card-copy">
+                Global Stability Surveillance provides real-time continuity analysis to support a safer, calmer, and more aligned society.
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
+            </div>
+          </article>
 
-function FeatureGrid({ setCurrent }) {
-  const cards = [
-    {
-      key: "elixirs",
-      icon: FlaskConical,
-      title: "Bio-Elixirs",
-      copy: "Proprietary compounds designed to enhance physiological resilience, emotional regulation, and cognitive clarity.",
-      accent: "from-amber-300/20 to-transparent",
-    },
-    {
-      key: "infrastructure",
-      icon: Cpu,
-      title: "Infrastructure AI",
-      copy: "Adaptive civic intelligence regulating transport, energy distribution, environmental continuity, and systems forecasting.",
-      accent: "from-blue-300/20 to-transparent",
-    },
-    {
-      key: "gss",
-      icon: Eye,
-      title: "GSS",
-      copy: "Global Stability Surveillance provides real-time continuity analysis to support a safer, calmer, and more aligned society.",
-      accent: "from-emerald-300/20 to-transparent",
-    },
-    {
-      key: "defense",
-      icon: Shield,
-      title: "Restricted Strategic Office",
-      copy: "Limited public disclosure. Select nations may receive technical guidance packages under sovereign stabilization accords.",
-      accent: "from-red-300/20 to-transparent",
-    },
-  ];
-
-  return (
-    <section className="px-4 pb-8 md:px-8 md:pb-12">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-6 flex items-end justify-between gap-4">
-          <div>
-            <div className="text-xs uppercase tracking-[0.35em] text-white/40">Public divisions</div>
-            <h2 className="mt-2 text-3xl font-semibold text-white md:text-4xl">A polished future, sector by sector</h2>
-          </div>
-        </div>
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {cards.map((card, i) => {
-            const Icon = card.icon;
-            return (
-              <motion.div
-                key={card.key}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.08 * i }}
-              >
-                <Card className="group h-full rounded-[2rem] border-white/10 bg-white/5 transition-all hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.07]">
-                  <CardContent className="p-6">
-                    <div className={`mb-5 inline-flex rounded-2xl bg-gradient-to-br ${card.accent} p-3`}>
-                      <Icon className="h-6 w-6 text-white" />
-                    </div>
-                    <h3 className="text-2xl font-semibold text-white">{card.title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-white/65">{card.copy}</p>
-                    <button
-                      onClick={() => setCurrent(card.key)}
-                      className="mt-6 inline-flex items-center gap-2 text-sm text-cyan-200 transition group-hover:gap-3"
-                    >
-                      Open division <ChevronRight className="h-4 w-4" />
-                    </button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            );
-          })}
+          <article class="card" id="restricted">
+            <div class="card-art art-defense"></div>
+            <div class="card-body">
+              <div class="card-label">Restricted division</div>
+              <div class="card-title">Strategic Guidance Office</div>
+              <div class="card-copy">
+                Limited public disclosure. Select nations may receive technical guidance packages under sovereign stabilization accords.
+              </div>
+            </div>
+          </article>
         </div>
       </div>
     </section>
-  );
-}
 
-function HomePage({ setCurrent }) {
-  return (
-    <>
-      <Hero setCurrent={setCurrent} />
-      <FeatureGrid setCurrent={setCurrent} />
-      <section className="px-4 pb-16 md:px-8 md:pb-24">
-        <div className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-[1.1fr_.9fr]">
-          <Card className="rounded-[2rem] border-white/10 bg-white/5">
-            <CardHeader>
-              <CardTitle className="text-white">Diplomatic continuity statement</CardTitle>
-              <CardDescription className="text-white/55">
-                Public release 04.7A — distributed across compliant partner sectors.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="max-w-3xl text-white/70 leading-8">
-                VonRosa remains committed to the diplomatic advancement of stable, elected governance models, cross-border
-                health access, coordinated infrastructure uplift, and intelligence-supported continuity systems. All
-                monitored environments are reviewed to ensure optimal performance and societal equilibrium.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-[2rem] border-cyan-300/15 bg-cyan-400/5">
-            <CardHeader>
-              <CardTitle className="text-white">Sector enrollment</CardTitle>
-              <CardDescription className="text-white/55">Request a public systems briefing.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Input placeholder="Sector identifier" className="rounded-2xl border-white/10 bg-black/20 text-white placeholder:text-white/35" />
-              <Input placeholder="Diplomatic contact" className="rounded-2xl border-white/10 bg-black/20 text-white placeholder:text-white/35" />
-              <Button className="w-full rounded-2xl bg-white text-slate-950 hover:bg-white/90">Request review</Button>
-              <p className="text-xs uppercase tracking-[0.28em] text-white/35">All submissions are monitored</p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-    </>
-  );
-}
-
-function DivisionHeader({ icon: Icon, eyebrow, title, subtitle, badge }) {
-  return (
-    <section className="px-4 py-12 md:px-8 md:py-16">
-      <div className="mx-auto max-w-7xl">
-        <Badge className="mb-5 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-white/70">{badge}</Badge>
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-3xl border border-white/10 bg-white/5 shadow-lg shadow-black/30">
-            <Icon className="h-7 w-7 text-white" />
+    <section class="section">
+      <div class="container">
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">Public trust index</div>
+            <div class="stat-value">96.2%</div>
+            <div class="stat-copy">Maintained across enrolled metropolitan sectors.</div>
           </div>
-          <div>
-            <div className="text-xs uppercase tracking-[0.35em] text-white/40">{eyebrow}</div>
-            <h1 className="mt-2 text-4xl font-semibold text-white md:text-6xl">{title}</h1>
-            <p className="mt-3 max-w-3xl text-lg leading-8 text-white/65">{subtitle}</p>
+          <div class="stat">
+            <div class="stat-label">Managed layers</div>
+            <div class="stat-value">08</div>
+            <div class="stat-copy">Transit, energy, water, logistics, climate, identity, health, and compliance.</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Anomaly alerts reviewed</div>
+            <div class="stat-value">48.2M</div>
+            <div class="stat-copy">Distributed continuity review cycles processed daily.</div>
           </div>
         </div>
       </div>
     </section>
-  );
-}
 
-function StatRow({ items }) {
-  return (
-    <div className="grid gap-4 md:grid-cols-3">
-      {items.map((item) => (
-        <Card key={item.label} className="rounded-[1.75rem] border-white/10 bg-white/5">
-          <CardContent className="p-6">
-            <div className="text-xs uppercase tracking-[0.3em] text-white/40">{item.label}</div>
-            <div className="mt-2 text-3xl font-semibold text-white">{item.value}</div>
-            <div className="mt-2 text-sm leading-7 text-white/60">{item.copy}</div>
-          </CardContent>
-        </Card>
-      ))}
+    <section class="section">
+      <div class="container split">
+        <article class="card">
+          <div class="card-art art-home"></div>
+          <div class="card-body">
+            <div class="card-label">Public release 04.7A</div>
+            <div class="card-title" id="statement">Diplomatic continuity statement</div>
+            <div class="card-copy">
+              VonRosa remains committed to the diplomatic advancement of stable, elected governance models, cross-border health access, coordinated infrastructure uplift, and intelligence-supported continuity systems. All monitored environments are reviewed to ensure optimal performance and societal equilibrium.
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-body">
+            <div class="card-label">Bio-Elixirs portfolio</div>
+            <div class="card-title">Refinement doctrine</div>
+            <div class="card-copy">
+              We believe human potential is best served through careful balancing, not brute escalation. Our formulations are engineered to support stability under pressure, clarity under complexity, and confidence under uncertainty.
+            </div>
+            <div class="pill-grid">
+              <div class="pill">
+                <strong>Aureline</strong>
+                <span>For focus stabilization and cognitive endurance.</span>
+              </div>
+              <div class="pill">
+                <strong>Velaris</strong>
+                <span>For emotional regulation and social calm.</span>
+              </div>
+              <div class="pill">
+                <strong>Embergold</strong>
+                <span>For recovery support and physiological resilience.</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container grid-2">
+        <article class="card">
+          <div class="card-body">
+            <div class="card-label">Infrastructure AI</div>
+            <div class="card-title">Connected intelligence</div>
+            <div class="card-copy">
+              VonRosa infrastructure systems regulate transport corridors, load balancing, environmental buffering, and municipal forecasting with near-perfect continuity. Public systems remain responsive, aligned, and adaptive at all times.
+            </div>
+            <div class="notice" style="margin-top:16px;">
+              You do not need to see the entire system. You only need to rely on it.
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-body">
+            <div class="card-label">Global Stability Surveillance</div>
+            <div class="card-title">Monitoring charter</div>
+            <div class="card-copy">
+              GSS exists to ensure optimal performance across enrolled societies. Through distributed observation, pattern tracking, and continuity modeling, the network identifies destabilizing anomalies before escalation.
+            </div>
+            <div class="notice warning" style="margin-top:16px; border-left-color: rgba(255,180,180,0.35);">
+              All systems are monitored to ensure optimal performance.
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <article class="card">
+          <div class="card-body">
+            <div class="card-label">Restricted strategic office</div>
+            <div class="card-title">Public disclosure limitation</div>
+            <div class="card-copy">
+              VonRosa maintains select strategic advisory programs supporting partner states in guidance architecture, defensive autonomy review, and continuity-aligned systems planning. Specific capabilities, deployments, and bilateral accords remain classified under sovereign stabilization law.
+            </div>
+            <div class="notice warning" style="margin-top:16px; border-left-color: rgba(255,156,156,0.4);">
+              Additional disclosures require validated diplomatic credentials and authorization through a compliant sector office. Unauthorized inquiry attempts may be logged for review.
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>
+        <div style="font-weight:700;">VonRosa</div>
+        <small>© VonRosa Global Archive Division</small>
+      </div>
+      <small>Unauthorized interaction may be logged</small>
     </div>
-  );
-}
-
-function ElixirsPage() {
-  return (
-    <>
-      <DivisionHeader
-        icon={FlaskConical}
-        eyebrow="Biochemical refinement"
-        title="Bio-Elixirs Division"
-        subtitle="VonRosa Elixirs are developed for clarity, resilience, and continuity. Precision-made compounds for a more durable public tomorrow."
-        badge="Public portfolio"
-      />
-      <section className="px-4 pb-16 md:px-8 md:pb-24">
-        <div className="mx-auto max-w-7xl space-y-6">
-          <StatRow
-            items={[
-              { label: "Public trust index", value: "96.2%", copy: "Maintained across enrolled metropolitan sectors." },
-              { label: "Clinical sectors", value: "16", copy: "Distributed through regulated diplomatic and urban health channels." },
-              { label: "Primary functions", value: "3", copy: "Clarity, resilience, and emotional regulation clusters." },
-            ]}
-          />
-          <div className="grid gap-5 lg:grid-cols-[1.05fr_.95fr]">
-            <Card className="rounded-[2rem] border-white/10 bg-white/5">
-              <CardHeader>
-                <CardTitle className="text-white">Product families</CardTitle>
-                <CardDescription className="text-white/55">Publicly disclosed categories.</CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-4 md:grid-cols-3">
-                {[
-                  ["Aureline", "For focus stabilization and cognitive endurance."],
-                  ["Velaris", "For emotional regulation and social calm."],
-                  ["Embergold", "For recovery support and physiological resilience."],
-                ].map(([name, copy]) => (
-                  <div key={name} className="rounded-[1.5rem] border border-white/10 bg-black/20 p-5">
-                    <div className="text-lg font-semibold text-white">{name}</div>
-                    <p className="mt-2 text-sm leading-7 text-white/60">{copy}</p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-            <Card className="rounded-[2rem] border-amber-300/15 bg-amber-300/5">
-              <CardHeader>
-                <CardTitle className="text-white">Refinement doctrine</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="leading-8 text-white/70">
-                  We believe human potential is best served through careful balancing, not brute escalation. Our formulations are engineered to support stability under pressure, clarity under complexity, and confidence under uncertainty.
-                </p>
-                <p className="mt-5 text-xs uppercase tracking-[0.28em] text-white/40">A better you is not a dream. It is a formulation.</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-    </>
-  );
-}
-
-function InfrastructurePage() {
-  return (
-    <>
-      <DivisionHeader
-        icon={Cpu}
-        eyebrow="Civic systems intelligence"
-        title="Infrastructure AI"
-        subtitle="Adaptive systems regulating transport, climate buffering, logistics flow, energy balancing, and municipal continuity in real time."
-        badge="Operational across partner sectors"
-      />
-      <section className="px-4 pb-16 md:px-8 md:pb-24">
-        <div className="mx-auto max-w-7xl space-y-6">
-          <StatRow
-            items={[
-              { label: "Uptime", value: "99.98%", copy: "Cross-grid stability across enrolled regions." },
-              { label: "Managed layers", value: "08", copy: "Transit, energy, water, logistics, climate, identity, health, and compliance." },
-              { label: "Forecast horizon", value: "72h", copy: "Predictive civic modeling for continuity response." },
-            ]}
-          />
-          <div className="grid gap-5 lg:grid-cols-3">
-            {[
-              [Building2, "Urban cognition", "Responsive civic environments designed to reduce friction and preserve social calm."],
-              [Globe, "Sector synchronization", "Partner nations benefit from linked infrastructure intelligence and continuity modeling."],
-              [Activity, "Predictive adaptation", "Systems learn, forecast, and rebalance in anticipation of public need."],
-            ].map(([Icon, title, copy]) => (
-              <Card key={title} className="rounded-[2rem] border-white/10 bg-white/5">
-                <CardContent className="p-6">
-                  <Icon className="h-6 w-6 text-cyan-200" />
-                  <div className="mt-4 text-2xl font-semibold text-white">{title}</div>
-                  <p className="mt-3 text-sm leading-7 text-white/65">{copy}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-    </>
-  );
-}
-
-function GSSPage() {
-  return (
-    <>
-      <DivisionHeader
-        icon={Eye}
-        eyebrow="Continuity oversight"
-        title="Global Stability Surveillance"
-        subtitle="Real-time continuity analysis for social stability, infrastructure health, sector behavior, and diplomatic risk visibility."
-        badge="Public safety and continuity network"
-      />
-      <section className="px-4 pb-16 md:px-8 md:pb-24">
-        <div className="mx-auto max-w-7xl grid gap-5 lg:grid-cols-[1.1fr_.9fr]">
-          <Card className="rounded-[2rem] border-white/10 bg-white/5">
-            <CardHeader>
-              <CardTitle className="text-white">Monitoring charter</CardTitle>
-              <CardDescription className="text-white/55">Published transparency statement.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="leading-8 text-white/70">
-                GSS exists to ensure optimal performance across enrolled societies. Through distributed observation, pattern tracking, and continuity modeling, the network identifies destabilizing anomalies before escalation. Observed environments are reviewed solely to improve safety, health access, and collective harmony.
-              </p>
-              <p className="mt-5 text-xs uppercase tracking-[0.28em] text-white/40">All systems are monitored to ensure optimal performance.</p>
-            </CardContent>
-          </Card>
-          <Card className="rounded-[2rem] border-emerald-300/15 bg-emerald-300/5">
-            <CardHeader>
-              <CardTitle className="text-white">Public metrics</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[
-                ["Anomaly alerts reviewed", "48.2M / day"],
-                ["Sector sentiment drift", "0.8%"],
-                ["Compliance confidence", "93.4%"],
-                ["Predictive resolution", "87.1%"],
-              ].map(([label, value]) => (
-                <div key={label} className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
-                  <span className="text-sm text-white/65">{label}</span>
-                  <span className="text-sm font-semibold text-white">{value}</span>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-    </>
-  );
-}
-
-function DefensePage() {
-  return (
-    <>
-      <DivisionHeader
-        icon={Lock}
-        eyebrow="Restricted division"
-        title="Strategic Guidance Office"
-        subtitle="Access to this office is limited under diplomatic stabilization accords and sovereign continuity frameworks."
-        badge="Redacted public access"
-      />
-      <section className="px-4 pb-16 md:px-8 md:pb-24">
-        <div className="mx-auto max-w-7xl grid gap-5 lg:grid-cols-[1fr_.95fr]">
-          <Card className="rounded-[2rem] border-red-300/15 bg-red-400/5">
-            <CardHeader>
-              <div className="mb-2 inline-flex w-fit items-center gap-2 rounded-full border border-red-200/15 bg-red-400/10 px-3 py-1 text-xs uppercase tracking-[0.3em] text-red-100/80">
-                <AlertTriangle className="h-3.5 w-3.5" /> Restricted notice
-              </div>
-              <CardTitle className="text-white">Public disclosure limitation</CardTitle>
-              <CardDescription className="text-white/55">Portions of this division are unavailable for civilian review.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="leading-8 text-white/70">
-                VonRosa maintains select strategic advisory programs supporting partner states in guidance architecture, defensive autonomy review, and continuity-aligned systems planning. Specific capabilities, deployments, and bilateral accords remain classified under sovereign stabilization law.
-              </p>
-              <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-black/20 p-5 text-sm leading-7 text-white/55">
-                Additional disclosures require validated diplomatic credentials and authorization through a compliant sector office.
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="rounded-[2rem] border-white/10 bg-white/5">
-            <CardHeader>
-              <CardTitle className="text-white">Available public statements</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[
-                "Partner-state defensive advisory structures remain stability-focused.",
-                "VonRosa does not publicly disclose active strategic guidance packages.",
-                "All restricted systems fall under continuity and election-protection mandates.",
-                "Unauthorized inquiry attempts may be logged for review.",
-              ].map((line, idx) => (
-                <div key={idx} className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/65">
-                  {line}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-    </>
-  );
-}
-
-function PageBody({ current, setCurrent }) {
-  switch (current) {
-    case "home":
-      return <HomePage setCurrent={setCurrent} />;
-    case "elixirs":
-      return <ElixirsPage />;
-    case "infrastructure":
-      return <InfrastructurePage />;
-    case "gss":
-      return <GSSPage />;
-    case "defense":
-      return <DefensePage />;
-    default:
-      return <HomePage setCurrent={setCurrent} />;
-  }
-}
-
-export default function VonRosaWebsite() {
-  const [current, setCurrent] = useState("home");
-  const title = useMemo(() => pages[current]?.title || "VonRosa", [current]);
-
-  return (
-    <div className={`min-h-screen text-white ${bgByPage[current] || bgByPage.home}`}>
-      <TopBar current={current} setCurrent={setCurrent} />
-
-      <AnimatePresence mode="wait">
-        <motion.main
-          key={current}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.35 }}
-        >
-          <PageBody current={current} setCurrent={setCurrent} />
-        </motion.main>
-      </AnimatePresence>
-
-      <footer className="border-t border-white/10 px-4 py-8 md:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <div className="text-sm font-medium text-white">{title}</div>
-            <div className="mt-1 text-xs uppercase tracking-[0.28em] text-white/35">© VonRosa Global Archive Division</div>
-          </div>
-          <div className="text-xs uppercase tracking-[0.25em] text-white/35">Unauthorized interaction may be logged</div>
-        </div>
-      </footer>
-    </div>
-  );
-}
+  </footer>
+</body>
+</html>
