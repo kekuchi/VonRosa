@@ -1,149 +1,543 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>VONROSA NODE</title>
-<style>
-    body {
-        background-color: black;
-        color: #00ff9c;
-        font-family: monospace;
-        margin: 0;
-        padding: 20px;
-    }
+import React, { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Shield, Cpu, FlaskConical, Eye, Lock, ChevronRight, AlertTriangle, Globe, Building2, Activity, ScanLine } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 
-    #terminal {
-        white-space: pre-wrap;
-        line-height: 1.4em;
-    }
+const pages = {
+  home: {
+    title: "VonRosa",
+    subtitle: "Shaping Stability Through Innovation",
+  },
+  elixirs: {
+    title: "Bio-Elixirs Division",
+    subtitle: "Refinement. Longevity. Clarity.",
+  },
+  infrastructure: {
+    title: "Infrastructure AI",
+    subtitle: "Connected intelligence for a unified tomorrow.",
+  },
+  gss: {
+    title: "Global Stability Surveillance",
+    subtitle: "Monitoring continuity across sectors.",
+  },
+  defense: {
+    title: "Strategic Guidance Office",
+    subtitle: "Restricted division. Limited disclosure.",
+  },
+};
 
-    input {
-        background: black;
-        border: none;
-        color: #00ff9c;
-        font-family: monospace;
-        font-size: 16px;
-        outline: none;
-        width: 90%;
-    }
+const navItems = [
+  { key: "home", label: "Archive" },
+  { key: "elixirs", label: "Bio-Elixirs" },
+  { key: "infrastructure", label: "Infrastructure AI" },
+  { key: "gss", label: "GSS" },
+  { key: "defense", label: "Restricted" },
+];
 
-    .hidden {
-        display: none;
-    }
-</style>
-</head>
+const bgByPage = {
+  home:
+    "bg-[radial-gradient(circle_at_top,_rgba(152,225,255,0.15),_transparent_30%),linear-gradient(180deg,_#09111a_0%,_#05080d_55%,_#030507_100%)]",
+  elixirs:
+    "bg-[radial-gradient(circle_at_top_left,_rgba(255,199,115,0.16),_transparent_30%),linear-gradient(180deg,_#140f0a_0%,_#090705_60%,_#040302_100%)]",
+  infrastructure:
+    "bg-[radial-gradient(circle_at_top_right,_rgba(90,159,255,0.18),_transparent_28%),linear-gradient(180deg,_#081019_0%,_#050811_58%,_#030509_100%)]",
+  gss:
+    "bg-[radial-gradient(circle_at_center,_rgba(103,255,169,0.12),_transparent_30%),linear-gradient(180deg,_#07130d_0%,_#050a08_60%,_#030504_100%)]",
+  defense:
+    "bg-[radial-gradient(circle_at_top,_rgba(255,79,79,0.10),_transparent_26%),linear-gradient(180deg,_#130809_0%,_#0a0506_58%,_#050304_100%)]",
+};
 
-<body>
+function TopBar({ current, setCurrent }) {
+  return (
+    <div className="sticky top-0 z-40 border-b border-white/10 bg-black/35 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-8">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-cyan-300/20 bg-white/5 shadow-lg shadow-cyan-500/10">
+            <ScanLine className="h-5 w-5 text-cyan-200" />
+          </div>
+          <div>
+            <div className="text-lg font-semibold tracking-[0.22em] text-white">VONROSA</div>
+            <div className="text-[10px] uppercase tracking-[0.35em] text-white/45">Global Archive Division</div>
+          </div>
+        </div>
 
-<div id="terminal"></div>
-<input id="input" autofocus />
-
-<script>
-const terminal = document.getElementById("terminal");
-const input = document.getElementById("input");
-
-let stage = "login_user";
-
-function typeLine(text, delay = 40) {
-    return new Promise(resolve => {
-        let i = 0;
-        const interval = setInterval(() => {
-            terminal.innerHTML += text.charAt(i);
-            i++;
-            if (i >= text.length) {
-                clearInterval(interval);
-                terminal.innerHTML += "\n";
-                resolve();
-            }
-        }, delay);
-    });
+        <div className="hidden items-center gap-2 md:flex">
+          {navItems.map((item) => (
+            <Button
+              key={item.key}
+              variant="ghost"
+              onClick={() => setCurrent(item.key)}
+              className={`rounded-2xl px-4 text-sm ${current === item.key ? "bg-white/10 text-white" : "text-white/60 hover:bg-white/5 hover:text-white"}`}
+            >
+              {item.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
-async function boot() {
-    await typeLine("> connection attempt detected...");
-    await delay(500);
-    await typeLine("> verifying...");
-    await delay(500);
-    await typeLine("> access requires authentication\n");
-    await typeLine("username:");
+function Hero({ setCurrent }) {
+  return (
+    <section className="relative overflow-hidden px-4 py-14 md:px-8 md:py-20">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.25fr_.75fr]">
+        <div>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <Badge className="mb-5 rounded-full border border-cyan-300/20 bg-cyan-400/10 px-4 py-1 text-cyan-100">
+              Established across sovereign sectors
+            </Badge>
+            <h1 className="max-w-4xl text-5xl font-semibold leading-tight tracking-tight text-white md:text-7xl">
+              Shaping Stability
+              <span className="block text-cyan-200/90">Through Innovation</span>
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/70 md:text-xl">
+              At VonRosa, equilibrium is not discovered. It is engineered. Through biochemical refinement,
+              adaptive intelligence systems, and cross-sector governance support, we provide the framework for a
+              more orderly global future.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button onClick={() => setCurrent("elixirs")} className="rounded-2xl bg-cyan-300 text-slate-950 hover:bg-cyan-200">
+                Explore divisions
+              </Button>
+              <Button onClick={() => setCurrent("gss")} variant="outline" className="rounded-2xl border-white/15 bg-white/5 text-white hover:bg-white/10">
+                Review public systems
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, delay: 0.1 }}
+        >
+          <Card className="overflow-hidden rounded-[2rem] border-white/10 bg-white/5 shadow-2xl shadow-cyan-900/20">
+            <CardContent className="p-0">
+              <div className="border-b border-white/10 bg-white/5 px-6 py-4 text-xs uppercase tracking-[0.3em] text-white/50">
+                Public Systems Overview
+              </div>
+              <div className="grid gap-0">
+                {[
+                  ["Biochemical refinement", "Operational across 16 sectors"],
+                  ["Infrastructure cognition", "Integrated into civic networks"],
+                  ["Continuity oversight", "Monitoring for optimal performance"],
+                  ["Strategic offices", "Restricted access protocols in place"],
+                ].map(([a, b]) => (
+                  <div key={a} className="flex items-center justify-between border-b border-white/10 px-6 py-5 last:border-b-0">
+                    <div>
+                      <div className="text-sm uppercase tracking-[0.25em] text-white/40">Division</div>
+                      <div className="mt-1 text-lg text-white">{a}</div>
+                    </div>
+                    <div className="text-right text-sm text-cyan-100/80">{b}</div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </section>
+  );
 }
 
-function delay(ms) {
-    return new Promise(res => setTimeout(res, ms));
+function FeatureGrid({ setCurrent }) {
+  const cards = [
+    {
+      key: "elixirs",
+      icon: FlaskConical,
+      title: "Bio-Elixirs",
+      copy: "Proprietary compounds designed to enhance physiological resilience, emotional regulation, and cognitive clarity.",
+      accent: "from-amber-300/20 to-transparent",
+    },
+    {
+      key: "infrastructure",
+      icon: Cpu,
+      title: "Infrastructure AI",
+      copy: "Adaptive civic intelligence regulating transport, energy distribution, environmental continuity, and systems forecasting.",
+      accent: "from-blue-300/20 to-transparent",
+    },
+    {
+      key: "gss",
+      icon: Eye,
+      title: "GSS",
+      copy: "Global Stability Surveillance provides real-time continuity analysis to support a safer, calmer, and more aligned society.",
+      accent: "from-emerald-300/20 to-transparent",
+    },
+    {
+      key: "defense",
+      icon: Shield,
+      title: "Restricted Strategic Office",
+      copy: "Limited public disclosure. Select nations may receive technical guidance packages under sovereign stabilization accords.",
+      accent: "from-red-300/20 to-transparent",
+    },
+  ];
+
+  return (
+    <section className="px-4 pb-8 md:px-8 md:pb-12">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <div className="text-xs uppercase tracking-[0.35em] text-white/40">Public divisions</div>
+            <h2 className="mt-2 text-3xl font-semibold text-white md:text-4xl">A polished future, sector by sector</h2>
+          </div>
+        </div>
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {cards.map((card, i) => {
+            const Icon = card.icon;
+            return (
+              <motion.div
+                key={card.key}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.08 * i }}
+              >
+                <Card className="group h-full rounded-[2rem] border-white/10 bg-white/5 transition-all hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.07]">
+                  <CardContent className="p-6">
+                    <div className={`mb-5 inline-flex rounded-2xl bg-gradient-to-br ${card.accent} p-3`}>
+                      <Icon className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-semibold text-white">{card.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-white/65">{card.copy}</p>
+                    <button
+                      onClick={() => setCurrent(card.key)}
+                      className="mt-6 inline-flex items-center gap-2 text-sm text-cyan-200 transition group-hover:gap-3"
+                    >
+                      Open division <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
 }
 
-input.addEventListener("keydown", async function(e) {
-    if (e.key === "Enter") {
-        let value = input.value.trim();
-        terminal.innerHTML += value + "\n";
-        input.value = "";
+function HomePage({ setCurrent }) {
+  return (
+    <>
+      <Hero setCurrent={setCurrent} />
+      <FeatureGrid setCurrent={setCurrent} />
+      <section className="px-4 pb-16 md:px-8 md:pb-24">
+        <div className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-[1.1fr_.9fr]">
+          <Card className="rounded-[2rem] border-white/10 bg-white/5">
+            <CardHeader>
+              <CardTitle className="text-white">Diplomatic continuity statement</CardTitle>
+              <CardDescription className="text-white/55">
+                Public release 04.7A — distributed across compliant partner sectors.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="max-w-3xl text-white/70 leading-8">
+                VonRosa remains committed to the diplomatic advancement of stable, elected governance models, cross-border
+                health access, coordinated infrastructure uplift, and intelligence-supported continuity systems. All
+                monitored environments are reviewed to ensure optimal performance and societal equilibrium.
+              </p>
+            </CardContent>
+          </Card>
 
-        if (stage === "login_user") {
-            window.username = value;
-            stage = "login_pass";
-            await typeLine("password:");
-        }
-
-        else if (stage === "login_pass") {
-            if (value === "open.channel") {
-                stage = "terminal";
-
-                await typeLine("\n> access granted\n");
-                await delay(500);
-                await typeLine("you shouldn't be here.");
-                await delay(1000);
-                await typeLine("\n...good.\n");
-                await delay(1200);
-                await typeLine("> observer is already active\n");
-                await delay(1000);
-                await typeLine("> we don't have much time\n");
-                await delay(800);
-                await typeLine("\n>");
-            } else {
-                await typeLine("> access denied\n");
-                await delay(500);
-                await typeLine("username:");
-                stage = "login_user";
-            }
-        }
-
-        else if (stage === "terminal") {
-            handleCommand(value);
-        }
-    }
-});
-
-async function handleCommand(cmd) {
-    cmd = cmd.toLowerCase();
-
-    if (cmd === "help") {
-        await typeLine("available commands:");
-        await typeLine("help");
-        await typeLine("status");
-        await typeLine("whoami");
-    }
-
-    else if (cmd === "status") {
-        await typeLine("> system unstable...");
-        await delay(500);
-        await typeLine("> sector 965 active");
-    }
-
-    else if (cmd === "whoami") {
-        await typeLine("> unknown");
-        await delay(500);
-        await typeLine("> but not alone");
-    }
-
-    else {
-        await typeLine("> command not recognized");
-    }
-
-    terminal.innerHTML += "\n>";
+          <Card className="rounded-[2rem] border-cyan-300/15 bg-cyan-400/5">
+            <CardHeader>
+              <CardTitle className="text-white">Sector enrollment</CardTitle>
+              <CardDescription className="text-white/55">Request a public systems briefing.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Input placeholder="Sector identifier" className="rounded-2xl border-white/10 bg-black/20 text-white placeholder:text-white/35" />
+              <Input placeholder="Diplomatic contact" className="rounded-2xl border-white/10 bg-black/20 text-white placeholder:text-white/35" />
+              <Button className="w-full rounded-2xl bg-white text-slate-950 hover:bg-white/90">Request review</Button>
+              <p className="text-xs uppercase tracking-[0.28em] text-white/35">All submissions are monitored</p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    </>
+  );
 }
 
-boot();
-</script>
+function DivisionHeader({ icon: Icon, eyebrow, title, subtitle, badge }) {
+  return (
+    <section className="px-4 py-12 md:px-8 md:py-16">
+      <div className="mx-auto max-w-7xl">
+        <Badge className="mb-5 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-white/70">{badge}</Badge>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-3xl border border-white/10 bg-white/5 shadow-lg shadow-black/30">
+            <Icon className="h-7 w-7 text-white" />
+          </div>
+          <div>
+            <div className="text-xs uppercase tracking-[0.35em] text-white/40">{eyebrow}</div>
+            <h1 className="mt-2 text-4xl font-semibold text-white md:text-6xl">{title}</h1>
+            <p className="mt-3 max-w-3xl text-lg leading-8 text-white/65">{subtitle}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
-</body>
-</html>
+function StatRow({ items }) {
+  return (
+    <div className="grid gap-4 md:grid-cols-3">
+      {items.map((item) => (
+        <Card key={item.label} className="rounded-[1.75rem] border-white/10 bg-white/5">
+          <CardContent className="p-6">
+            <div className="text-xs uppercase tracking-[0.3em] text-white/40">{item.label}</div>
+            <div className="mt-2 text-3xl font-semibold text-white">{item.value}</div>
+            <div className="mt-2 text-sm leading-7 text-white/60">{item.copy}</div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function ElixirsPage() {
+  return (
+    <>
+      <DivisionHeader
+        icon={FlaskConical}
+        eyebrow="Biochemical refinement"
+        title="Bio-Elixirs Division"
+        subtitle="VonRosa Elixirs are developed for clarity, resilience, and continuity. Precision-made compounds for a more durable public tomorrow."
+        badge="Public portfolio"
+      />
+      <section className="px-4 pb-16 md:px-8 md:pb-24">
+        <div className="mx-auto max-w-7xl space-y-6">
+          <StatRow
+            items={[
+              { label: "Public trust index", value: "96.2%", copy: "Maintained across enrolled metropolitan sectors." },
+              { label: "Clinical sectors", value: "16", copy: "Distributed through regulated diplomatic and urban health channels." },
+              { label: "Primary functions", value: "3", copy: "Clarity, resilience, and emotional regulation clusters." },
+            ]}
+          />
+          <div className="grid gap-5 lg:grid-cols-[1.05fr_.95fr]">
+            <Card className="rounded-[2rem] border-white/10 bg-white/5">
+              <CardHeader>
+                <CardTitle className="text-white">Product families</CardTitle>
+                <CardDescription className="text-white/55">Publicly disclosed categories.</CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-4 md:grid-cols-3">
+                {[
+                  ["Aureline", "For focus stabilization and cognitive endurance."],
+                  ["Velaris", "For emotional regulation and social calm."],
+                  ["Embergold", "For recovery support and physiological resilience."],
+                ].map(([name, copy]) => (
+                  <div key={name} className="rounded-[1.5rem] border border-white/10 bg-black/20 p-5">
+                    <div className="text-lg font-semibold text-white">{name}</div>
+                    <p className="mt-2 text-sm leading-7 text-white/60">{copy}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+            <Card className="rounded-[2rem] border-amber-300/15 bg-amber-300/5">
+              <CardHeader>
+                <CardTitle className="text-white">Refinement doctrine</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="leading-8 text-white/70">
+                  We believe human potential is best served through careful balancing, not brute escalation. Our formulations are engineered to support stability under pressure, clarity under complexity, and confidence under uncertainty.
+                </p>
+                <p className="mt-5 text-xs uppercase tracking-[0.28em] text-white/40">A better you is not a dream. It is a formulation.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function InfrastructurePage() {
+  return (
+    <>
+      <DivisionHeader
+        icon={Cpu}
+        eyebrow="Civic systems intelligence"
+        title="Infrastructure AI"
+        subtitle="Adaptive systems regulating transport, climate buffering, logistics flow, energy balancing, and municipal continuity in real time."
+        badge="Operational across partner sectors"
+      />
+      <section className="px-4 pb-16 md:px-8 md:pb-24">
+        <div className="mx-auto max-w-7xl space-y-6">
+          <StatRow
+            items={[
+              { label: "Uptime", value: "99.98%", copy: "Cross-grid stability across enrolled regions." },
+              { label: "Managed layers", value: "08", copy: "Transit, energy, water, logistics, climate, identity, health, and compliance." },
+              { label: "Forecast horizon", value: "72h", copy: "Predictive civic modeling for continuity response." },
+            ]}
+          />
+          <div className="grid gap-5 lg:grid-cols-3">
+            {[
+              [Building2, "Urban cognition", "Responsive civic environments designed to reduce friction and preserve social calm."],
+              [Globe, "Sector synchronization", "Partner nations benefit from linked infrastructure intelligence and continuity modeling."],
+              [Activity, "Predictive adaptation", "Systems learn, forecast, and rebalance in anticipation of public need."],
+            ].map(([Icon, title, copy]) => (
+              <Card key={title} className="rounded-[2rem] border-white/10 bg-white/5">
+                <CardContent className="p-6">
+                  <Icon className="h-6 w-6 text-cyan-200" />
+                  <div className="mt-4 text-2xl font-semibold text-white">{title}</div>
+                  <p className="mt-3 text-sm leading-7 text-white/65">{copy}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function GSSPage() {
+  return (
+    <>
+      <DivisionHeader
+        icon={Eye}
+        eyebrow="Continuity oversight"
+        title="Global Stability Surveillance"
+        subtitle="Real-time continuity analysis for social stability, infrastructure health, sector behavior, and diplomatic risk visibility."
+        badge="Public safety and continuity network"
+      />
+      <section className="px-4 pb-16 md:px-8 md:pb-24">
+        <div className="mx-auto max-w-7xl grid gap-5 lg:grid-cols-[1.1fr_.9fr]">
+          <Card className="rounded-[2rem] border-white/10 bg-white/5">
+            <CardHeader>
+              <CardTitle className="text-white">Monitoring charter</CardTitle>
+              <CardDescription className="text-white/55">Published transparency statement.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="leading-8 text-white/70">
+                GSS exists to ensure optimal performance across enrolled societies. Through distributed observation, pattern tracking, and continuity modeling, the network identifies destabilizing anomalies before escalation. Observed environments are reviewed solely to improve safety, health access, and collective harmony.
+              </p>
+              <p className="mt-5 text-xs uppercase tracking-[0.28em] text-white/40">All systems are monitored to ensure optimal performance.</p>
+            </CardContent>
+          </Card>
+          <Card className="rounded-[2rem] border-emerald-300/15 bg-emerald-300/5">
+            <CardHeader>
+              <CardTitle className="text-white">Public metrics</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {[
+                ["Anomaly alerts reviewed", "48.2M / day"],
+                ["Sector sentiment drift", "0.8%"],
+                ["Compliance confidence", "93.4%"],
+                ["Predictive resolution", "87.1%"],
+              ].map(([label, value]) => (
+                <div key={label} className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                  <span className="text-sm text-white/65">{label}</span>
+                  <span className="text-sm font-semibold text-white">{value}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function DefensePage() {
+  return (
+    <>
+      <DivisionHeader
+        icon={Lock}
+        eyebrow="Restricted division"
+        title="Strategic Guidance Office"
+        subtitle="Access to this office is limited under diplomatic stabilization accords and sovereign continuity frameworks."
+        badge="Redacted public access"
+      />
+      <section className="px-4 pb-16 md:px-8 md:pb-24">
+        <div className="mx-auto max-w-7xl grid gap-5 lg:grid-cols-[1fr_.95fr]">
+          <Card className="rounded-[2rem] border-red-300/15 bg-red-400/5">
+            <CardHeader>
+              <div className="mb-2 inline-flex w-fit items-center gap-2 rounded-full border border-red-200/15 bg-red-400/10 px-3 py-1 text-xs uppercase tracking-[0.3em] text-red-100/80">
+                <AlertTriangle className="h-3.5 w-3.5" /> Restricted notice
+              </div>
+              <CardTitle className="text-white">Public disclosure limitation</CardTitle>
+              <CardDescription className="text-white/55">Portions of this division are unavailable for civilian review.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="leading-8 text-white/70">
+                VonRosa maintains select strategic advisory programs supporting partner states in guidance architecture, defensive autonomy review, and continuity-aligned systems planning. Specific capabilities, deployments, and bilateral accords remain classified under sovereign stabilization law.
+              </p>
+              <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-black/20 p-5 text-sm leading-7 text-white/55">
+                Additional disclosures require validated diplomatic credentials and authorization through a compliant sector office.
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="rounded-[2rem] border-white/10 bg-white/5">
+            <CardHeader>
+              <CardTitle className="text-white">Available public statements</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {[
+                "Partner-state defensive advisory structures remain stability-focused.",
+                "VonRosa does not publicly disclose active strategic guidance packages.",
+                "All restricted systems fall under continuity and election-protection mandates.",
+                "Unauthorized inquiry attempts may be logged for review.",
+              ].map((line, idx) => (
+                <div key={idx} className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/65">
+                  {line}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function PageBody({ current, setCurrent }) {
+  switch (current) {
+    case "home":
+      return <HomePage setCurrent={setCurrent} />;
+    case "elixirs":
+      return <ElixirsPage />;
+    case "infrastructure":
+      return <InfrastructurePage />;
+    case "gss":
+      return <GSSPage />;
+    case "defense":
+      return <DefensePage />;
+    default:
+      return <HomePage setCurrent={setCurrent} />;
+  }
+}
+
+export default function VonRosaWebsite() {
+  const [current, setCurrent] = useState("home");
+  const title = useMemo(() => pages[current]?.title || "VonRosa", [current]);
+
+  return (
+    <div className={`min-h-screen text-white ${bgByPage[current] || bgByPage.home}`}>
+      <TopBar current={current} setCurrent={setCurrent} />
+
+      <AnimatePresence mode="wait">
+        <motion.main
+          key={current}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.35 }}
+        >
+          <PageBody current={current} setCurrent={setCurrent} />
+        </motion.main>
+      </AnimatePresence>
+
+      <footer className="border-t border-white/10 px-4 py-8 md:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="text-sm font-medium text-white">{title}</div>
+            <div className="mt-1 text-xs uppercase tracking-[0.28em] text-white/35">© VonRosa Global Archive Division</div>
+          </div>
+          <div className="text-xs uppercase tracking-[0.25em] text-white/35">Unauthorized interaction may be logged</div>
+        </div>
+      </footer>
+    </div>
+  );
+}
