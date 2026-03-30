@@ -1,1 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>VonRosa Access Portal</title>
+<style>
+body {
+  background: #05080d;
+  color: #eaf6ff;
+  font-family: monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
+.container {
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 40px;
+  border-radius: 10px;
+  width: 300px;
+}
+
+input {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  background: black;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #00ff9c;
+}
+
+button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 10px;
+  background: #00ff9c;
+  border: none;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h3>VonRosa Access Portal</h3>
+
+<input id="user" placeholder="Username">
+<input id="pass" placeholder="Password" type="password">
+
+<button onclick="login()">Login</button>
+
+<p id="msg"></p>
+</div>
+
+<script>
+function login() {
+  let u = document.getElementById("user").value;
+  let p = document.getElementById("pass").value;
+
+  if (u === "observer" && p === "open.channel") {
+    window.location.href = "/node_7/";
+  } else {
+    document.getElementById("msg").innerText = "Invalid credentials";
+  }
+}
+</script>
+
+</body>
+</html>
