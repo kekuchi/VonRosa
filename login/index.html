@@ -58,8 +58,13 @@ function login() {
   let u = document.getElementById("user").value;
   let p = document.getElementById("pass").value;
 
-  if (u === "observer" && p === "open.channel") {
-    window.location.href = "/node_7/";
+  if (u === "rain.wlr" && p === "6f70656e2e6368616e6e656c") {
+    document.getElementById("msg").innerText = "Redirecting...";
+    
+    setTimeout(() => {
+      window.location.href = "/node_7/";
+    }, 1500);
+
   } else {
     document.getElementById("msg").innerText = "Invalid credentials";
   }
