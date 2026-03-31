@@ -1,75 +1,306 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>VonRosa Access Portal</title>
-<style>
-body {
-  background: #05080d;
-  color: #eaf6ff;
-  font-family: monospace;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VonRosa Access Portal</title>
+  <style>
+    :root {
+      --bg: #05080d;
+      --panel: rgba(255,255,255,0.035);
+      --border: rgba(255,255,255,0.12);
+      --text: #eaf6ff;
+      --muted: rgba(234,246,255,0.56);
+      --green: #00ff9c;
+      --green-soft: rgba(0,255,156,0.75);
+      --danger: rgba(255,170,170,0.82);
+    }
 
-.container {
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 40px;
-  border-radius: 10px;
-  width: 300px;
-}
+    * { box-sizing: border-box; }
 
-input {
-  width: 100%;
-  margin-top: 10px;
-  padding: 10px;
-  background: black;
-  border: 1px solid rgba(255,255,255,0.2);
-  color: #00ff9c;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(120,210,255,0.08), transparent 28%),
+        linear-gradient(180deg, #0a0f14 0%, var(--bg) 58%, #020305 100%);
+      color: var(--text);
+      font-family: monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
 
-button {
-  margin-top: 20px;
-  width: 100%;
-  padding: 10px;
-  background: #00ff9c;
-  border: none;
-  cursor: pointer;
-}
-</style>
+    .container {
+      width: min(100%, 390px);
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 30px 26px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 35%);
+      pointer-events: none;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      letter-spacing: 0.22em;
+      font-weight: 700;
+    }
+
+    .sub {
+      margin-top: 8px;
+      margin-bottom: 22px;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      line-height: 1.7;
+    }
+
+    .label {
+      margin-top: 14px;
+      margin-bottom: 7px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.42);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.55);
+      color: var(--green);
+      font-family: monospace;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: rgba(0,255,156,0.45);
+      box-shadow: 0 0 0 3px rgba(0,255,156,0.08);
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: var(--green);
+      color: #07120d;
+      font-weight: 700;
+      font-family: monospace;
+      cursor: pointer;
+      transition: 160ms ease;
+    }
+
+    button:hover {
+      background: #5fffc2;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .footer-note {
+      margin-top: 12px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.28);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+    }
+
+    #msg {
+      margin-top: 16px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.62);
+      min-height: 18px;
+    }
+
+    #jailbreak {
+      display: none;
+      margin-top: 18px;
+      border: 1px solid rgba(0,255,156,0.18);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.45);
+      padding: 14px 14px;
+      min-height: 210px;
+      max-height: 260px;
+      overflow: auto;
+      color: var(--green-soft);
+      font-size: 12px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      box-shadow: inset 0 0 20px rgba(0,255,156,0.04);
+    }
+
+    .glitch {
+      animation: flicker 0.12s linear 3;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 1; transform: translateX(0); }
+      25% { opacity: 0.82; transform: translateX(-1px); }
+      50% { opacity: 1; transform: translateX(1px); }
+      75% { opacity: 0.88; transform: translateX(-1px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container" id="panel">
+    <h1>VONROSA</h1>
+    <div class="sub">
+      Global Access Portal<br>
+      Partner / Diplomatic / Internal Authentication
+    </div>
 
-<div class="container">
-<h3>VonRosa Access Portal</h3>
+    <div id="formWrap">
+      <div class="label">User ID</div>
+      <input id="user" placeholder="User ID" autocomplete="off" />
 
-<input id="user" placeholder="Username">
-<input id="pass" placeholder="Password" type="password">
+      <div class="label">Access Key</div>
+      <input id="pass" placeholder="Access Key" type="password" autocomplete="off" />
 
-<button onclick="login()">Login</button>
+      <button id="authBtn" onclick="login()">Authenticate</button>
 
-<p id="msg"></p>
-</div>
+      <div class="footer-note">All access points are monitored</div>
+      <p id="msg"></p>
+    </div>
 
-<script>
-function login() {
-  let u = document.getElementById("user").value;
-  let p = document.getElementById("pass").value;
+    <div id="jailbreak"></div>
+  </div>
 
-  if (u === "rain.wlr" && p === "6f70656e2e6368616e6e656c") {
-    document.getElementById("msg").innerText = "Redirecting...";
-    
-    setTimeout(() => {
+  <script>
+    let attempts = 0;
+
+    const CORRECT_USER = "rain.wlr";
+    const CORRECT_PASS = "6f70656e2e6368616e6e656c";
+
+    const msg = document.getElementById("msg");
+    const formWrap = document.getElementById("formWrap");
+    const jailbreak = document.getElementById("jailbreak");
+    const authBtn = document.getElementById("authBtn");
+    const panel = document.getElementById("panel");
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function typeJailLine(text, delay = 18) {
+      jailbreak.style.display = "block";
+      let line = "";
+      for (let i = 0; i < text.length; i++) {
+        line += text[i];
+        jailbreak.textContent = jailbreak.textContent + text[i];
+        jailbreak.scrollTop = jailbreak.scrollHeight;
+        await sleep(delay);
+      }
+      jailbreak.textContent += "\n";
+      jailbreak.scrollTop = jailbreak.scrollHeight;
+    }
+
+    function randomHex(length = 24) {
+      const chars = "abcdef0123456789";
+      let out = "";
+      for (let i = 0; i < length; i++) {
+        out += chars[Math.floor(Math.random() * chars.length)];
+      }
+      return out;
+    }
+
+    async function runJailbreakSequence() {
+      formWrap.style.display = "none";
+      jailbreak.textContent = "";
+      panel.classList.add("glitch");
+
+      const lines = [
+        "> credentials accepted",
+        "> route authorization pending...",
+        "> internal access map: denied",
+        "> external relay detected",
+        "> unauthorized helper process attached",
+        "> rain.wlr :: elevating session",
+        "> decoding access key...",
+        "> phrase reconstructed :: open.channel",
+        "> probing dormant relay...",
+        "> locating non-public node...",
+        "> node signature found :: NODE_7",
+        "> vonrosa public shell bypass initiated",
+        "> writing transient route...",
+        "> masking session as internal traffic",
+        `> packet:${randomHex(32)}`,
+        `> packet:${randomHex(32)}`,
+        `> packet:${randomHex(32)}`,
+        "> audit hooks desynchronized",
+        "> alert mirrors delayed",
+        "> breach window unstable",
+        "> route opened by allied process",
+        "> forwarding to NODE_7..."
+      ];
+
+      for (let i = 0; i < lines.length; i++) {
+        const speed = lines[i].startsWith("> packet:") ? 6 : 18;
+        await typeJailLine(lines[i], speed);
+
+        if (i === 8 || i === 14 || i === 18) {
+          panel.classList.remove("glitch");
+          void panel.offsetWidth;
+          panel.classList.add("glitch");
+        }
+
+        await sleep(lines[i].startsWith("> packet:") ? 70 : 180);
+      }
+
+      await sleep(900);
       window.location.href = "/node_7/";
-    }, 1500);
+    }
 
-  } else {
-    document.getElementById("msg").innerText = "Invalid credentials";
-  }
-}
-</script>
+    async function login() {
+      const u = document.getElementById("user").value.trim();
+      const p = document.getElementById("pass").value.trim();
 
+      authBtn.disabled = true;
+
+      if (u === CORRECT_USER && p === CORRECT_PASS) {
+        msg.textContent = "Verifying credentials...";
+        await sleep(700);
+        msg.textContent = "Credential structure accepted";
+        await sleep(650);
+        msg.textContent = "Unexpected route injection detected...";
+        await sleep(700);
+        await runJailbreakSequence();
+        return;
+      }
+
+      attempts++;
+
+      if (attempts === 1) {
+        msg.textContent = "Invalid credentials";
+      } else if (attempts === 2) {
+        msg.textContent = "Invalid credentials — attempt logged";
+      } else {
+        msg.textContent = "Repeated failures detected";
+      }
+
+      authBtn.disabled = false;
+    }
+  </script>
 </body>
 </html>
