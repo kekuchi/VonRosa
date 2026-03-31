@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8">
+<title>VONROSA NODE</title>
+<style>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NODE_7</title>
@@ -9,27 +12,35 @@
       --bg: #000000;
       --fg: #00e995;
       --fg-dim: rgba(0, 233, 149, 0.62);
-      --fg-faint: rgba(0, 233, 149, 0.26);
+      --fg-faint: rgba(0, 233, 149, 0.28);
       --danger: #ff5a5a;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     html, body {
       margin: 0;
       padding: 0;
-      min-height: 100%;
       background: var(--bg);
       color: var(--fg);
       font-family: monospace;
+      min-height: 100%;
       overflow-x: hidden;
     }
 
     body {
+        background-color: black;
+        color: #00ff9c;
+        font-family: monospace;
+        margin: 0;
+        padding: 20px;
       position: relative;
       padding: 18px;
     }
 
+    /* Subtle screen texture */
     body::before {
       content: "";
       position: fixed;
@@ -47,6 +58,7 @@
       z-index: 2;
     }
 
+    /* Soft vignette */
     body::after {
       content: "";
       position: fixed;
@@ -111,6 +123,8 @@
     }
 
     #terminal {
+        white-space: pre-wrap;
+        line-height: 1.4em;
       white-space: pre-wrap;
       line-height: 1.45em;
       min-height: 72vh;
@@ -118,6 +132,14 @@
       text-shadow: 0 0 3px rgba(0, 233, 149, 0.18);
     }
 
+    input {
+        background: black;
+        border: none;
+        color: #00ff9c;
+        font-family: monospace;
+        font-size: 16px;
+        outline: none;
+        width: 90%;
     #input-row {
       display: flex;
       align-items: center;
@@ -128,6 +150,8 @@
       padding-top: 12px;
     }
 
+    .hidden {
+        display: none;
     #prompt {
       color: var(--fg);
       opacity: 0.9;
@@ -146,21 +170,24 @@
       text-shadow: 0 0 4px rgba(0, 233, 149, 0.22);
     }
 
-    #input:disabled {
-      opacity: 0.45;
-    }
-
     a {
       color: #7effca;
       text-decoration: underline;
     }
 
-    .faint { color: var(--fg-faint); }
-    .warn { color: var(--danger); }
+    .faint {
+      color: var(--fg-faint);
+    }
+
+    .warn {
+      color: var(--danger);
+    }
 
     .glitch {
       animation: glitchFlash 0.11s linear 3;
     }
+</style>
+</head>
 
     @keyframes glitchFlash {
       0%   { opacity: 1; transform: translateX(0); }
@@ -179,16 +206,94 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
+
+    .blink {
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
   </style>
 </head>
 <body>
   <div id="noise"></div>
   <div id="scanline"></div>
 
+<div id="terminal"></div>
+<input id="input" autofocus />
+
+<script>
+const terminal = document.getElementById("terminal");
+const input = document.getElementById("input");
+
+let stage = "login_user";
+
+function typeLine(text, delay = 40) {
+    return new Promise(resolve => {
+        let i = 0;
+        const interval = setInterval(() => {
+            terminal.innerHTML += text.charAt(i);
+            i++;
+            if (i >= text.length) {
+                clearInterval(interval);
+                terminal.innerHTML += "\n";
+                resolve();
+            }
+        }, delay);
+    });
+}
+
+async function boot() {
+    await typeLine("> connection attempt detected...");
+    await delay(500);
+    await typeLine("> verifying...");
+    await delay(500);
+    await typeLine("> access requires authentication\n");
+    await typeLine("username:");
+}
+
+function delay(ms) {
+    return new Promise(res => setTimeout(res, ms));
+}
+
+input.addEventListener("keydown", async function(e) {
+    if (e.key === "Enter") {
+        let value = input.value.trim();
+        terminal.innerHTML += value + "\n";
+        input.value = "";
+
+        if (stage === "login_user") {
+            window.username = value;
+            stage = "login_pass";
+            await typeLine("password:");
+        }
   <div id="terminal-wrap">
     <div id="header">NODE_7 // relay environment // non-public channel</div>
     <div id="terminal"></div>
 
+        else if (stage === "login_pass") {
+            if (value === "open.channel") {
+                stage = "terminal";
+
+                await typeLine("\n> access granted\n");
+                await delay(500);
+                await typeLine("you shouldn't be here.");
+                await delay(1000);
+                await typeLine("\n...good.\n");
+                await delay(1200);
+                await typeLine("> observer is already active\n");
+                await delay(1000);
+                await typeLine("> we don't have much time\n");
+                await delay(800);
+                await typeLine("\n>");
+            } else {
+                await typeLine("> access denied\n");
+                await delay(500);
+                await typeLine("username:");
+                stage = "login_user";
+            }
+        }
     <div id="input-row">
       <span id="prompt">></span>
       <input id="input" autocomplete="off" autofocus />
@@ -203,11 +308,15 @@
     let stage = "login_user";
     let loginUser = "";
     let commsUnlocked = false;
-    let observerTriggered = false;
-    let observerLock = false;
 
     const SECOND_USER = "rain.wlr";
     const SECOND_PASS = "open.channel";
+    const PHONE_NUMBER = "+1 XXX XXX XXXX"; // REPLACE THIS
+    const FILE_LINKS = [
+      { label: "/files/archive_01.zip", href: "/files/archive_01.zip" },
+      { label: "/files/node_fragment.png", href: "/files/node_fragment.png" },
+      { label: "/files/audio_log_01.wav", href: "/files/audio_log_01.wav" }
+    ];
 
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
@@ -224,11 +333,13 @@
       terminalWrap.classList.add("glitch");
     }
 
+        else if (stage === "terminal") {
+            handleCommand(value);
     function randomCorrupt(text) {
       const pool = ["▒", "▓", "░", "̴", "̵", "̷"];
       let out = "";
       for (const ch of text) {
-        if (ch !== " " && Math.random() < 0.07) {
+        if (ch !== " " && Math.random() < 0.06) {
           out += pool[Math.floor(Math.random() * pool.length)];
         } else {
           out += ch;
@@ -236,12 +347,20 @@
       }
       return out;
     }
+});
 
-    async function typeLine(text = "", speed = 16, className = "") {
+async function handleCommand(cmd) {
+    cmd = cmd.toLowerCase();
+    async function typeLine(text = "", speed = 16) {
       const line = document.createElement("div");
-      line.className = `fade-in ${className}`.trim();
+      line.className = "fade-in";
       terminal.appendChild(line);
 
+    if (cmd === "help") {
+        await typeLine("available commands:");
+        await typeLine("help");
+        await typeLine("status");
+        await typeLine("whoami");
       for (let i = 0; i < text.length; i++) {
         line.textContent += text[i];
         if (i % 2 === 0) scrollDown();
@@ -260,6 +379,10 @@
       await sleep(50);
     }
 
+    else if (cmd === "status") {
+        await typeLine("> system unstable...");
+        await delay(500);
+        await typeLine("> sector 965 active");
     async function printUserInput(value) {
       const line = document.createElement("div");
       line.textContent = value;
@@ -268,6 +391,10 @@
       await sleep(30);
     }
 
+    else if (cmd === "whoami") {
+        await typeLine("> unknown");
+        await delay(500);
+        await typeLine("> but not alone");
     async function bootSequence() {
       await typeLine("> node signature located :: NODE_7", 18);
       await sleep(250);
@@ -278,12 +405,14 @@
       triggerGlitch();
       await typeLine(randomCorrupt("> relay desync residuals detected"), 15);
       await sleep(300);
-      await typeLine("");
+      await typeLine("", 10);
       await typeLine("username:", 18);
     }
 
+    else {
+        await typeLine("> command not recognized");
     async function loginSuccessSequence() {
-      await typeLine("");
+      await typeLine("", 10);
       await typeLine("> route accepted", 18);
       await sleep(400);
       triggerGlitch();
@@ -310,7 +439,6 @@
       await sleep(450);
       await typeLine("rain.wlr: type HELP.", 18);
       commsUnlocked = true;
-      scheduleObserverIntrusion();
     }
 
     async function glitchBurst() {
@@ -322,41 +450,7 @@
         randomCorrupt("> relay noise spike"),
         randomCorrupt("> packet loss rising")
       ];
-      await typeLine(bursts[Math.floor(Math.random() * bursts.length)], 10, "faint");
-    }
-
-    function scheduleObserverIntrusion() {
-      const delayMs = 45000 + Math.floor(Math.random() * 15000);
-      setTimeout(async () => {
-        if (!commsUnlocked || observerTriggered) return;
-        observerTriggered = true;
-        observerLock = true;
-        input.disabled = true;
-
-        triggerGlitch();
-        await typeLine("", 10);
-        await typeLine(randomCorrupt("> unauthorized pattern detected"), 10, "warn");
-        await sleep(400);
-        triggerGlitch();
-        await typeLine(randomCorrupt("> process collision :: OBSERVER"), 9, "warn");
-        await sleep(700);
-        await typeLine("OBSERVER: you were not granted this route.", 18, "warn");
-        await sleep(600);
-        await typeLine("OBSERVER: this relay does not belong to you.", 18, "warn");
-        await sleep(700);
-        triggerGlitch();
-        await typeLine(randomCorrupt("rain.wlr: ignore it. do not respond to it directly."), 14);
-        await sleep(700);
-        await typeLine("OBSERVER: i can see the handshake residue.", 18, "warn");
-        await sleep(800);
-        await typeLine("> relay instability rising", 18);
-        await sleep(400);
-        await typeLine("> input restored", 18);
-
-        input.disabled = false;
-        input.focus();
-        observerLock = false;
-      }, delayMs);
+      await typeLine(bursts[Math.floor(Math.random() * bursts.length)], 10);
     }
 
     async function handleCommsCommand(raw) {
@@ -378,16 +472,19 @@
         await typeLine("commands:", 16);
         await typeLine("STATUS", 16);
         await typeLine("RAIN", 16);
-        await typeLine("DATA", 16);
+        await typeLine("VOICE", 16);
+        await typeLine("FILES", 16);
+        await typeLine("PACKAGE", 16);
         await typeLine("OBSERVER", 16);
+        await typeLine("SECTOR965", 16);
         return;
       }
 
       if (cmd === "status") {
         await typeLine("> relay integrity :: unstable", 16);
-        await sleep(200);
+        await sleep(220);
         await typeLine("> watcher probability :: elevated", 16);
-        await sleep(200);
+        await sleep(220);
         await typeLine("> route source :: allied", 16);
         return;
       }
@@ -396,19 +493,37 @@
         await typeLine("rain.wlr: i opened the route, not the system.", 18);
         await sleep(350);
         await typeLine("rain.wlr: don’t assume i control what sees you now.", 18);
-        await sleep(350);
-        await typeLine("rain.wlr: take what you need and move.", 18);
         return;
       }
 
-      if (cmd === "data") {
-        await typeLine("rain.wlr: pushing files...", 18);
-        await sleep(700);
-        await typeHTMLLine(`<a href="/files/Op7-Data.rar" target="_blank">/files/Op7-Data.rar</a>`);
-        await sleep(250);
-        await typeHTMLLine(`<a href="/files/Remember-It.png" target="_blank">/files/Remember-It.png</a>`);
-        await sleep(400);
-        await typeLine("rain.wlr: do not linger here.", 18);
+      if (cmd === "voice") {
+        await typeLine("rain.wlr: text channel degrading...", 18);
+        await sleep(500);
+        await typeLine("rain.wlr: they watch text faster than voice.", 18);
+        await sleep(500);
+        await typeLine("rain.wlr: use alternate relay:", 18);
+        await sleep(450);
+        await typeLine(PHONE_NUMBER, 18);
+        return;
+      }
+
+      if (cmd === "files") {
+        await typeLine("rain.wlr: available transfers:", 18);
+        await sleep(300);
+
+        for (const file of FILE_LINKS) {
+          await typeHTMLLine(`<a href="${file.href}" target="_blank">${file.label}</a>`);
+          await sleep(120);
+        }
+        return;
+      }
+
+      if (cmd === "package") {
+        await typeLine("rain.wlr: transmitting package...", 18);
+        await sleep(900);
+        triggerGlitch();
+        await typeLine("> transfer complete", 18);
+        await typeHTMLLine(`<a href="/files/package_alpha.rar" target="_blank">/files/package_alpha.rar</a>`);
         return;
       }
 
@@ -420,6 +535,18 @@
         return;
       }
 
+      if (cmd === "sector965") {
+        await typeLine("rain.wlr: sector 965 responded when it should have remained silent.", 18);
+        await sleep(450);
+        await typeLine("rain.wlr: that is why this route exists.", 18);
+        return;
+      }
+
+      if (cmd === "clear") {
+        terminal.innerHTML = "";
+        return;
+      }
+
       if (Math.random() < 0.35) {
         await glitchBurst();
       }
@@ -427,10 +554,10 @@
       await typeLine("> command not recognized", 18);
     }
 
+    terminal.innerHTML += "\n>";
+}
     input.addEventListener("keydown", async (e) => {
       if (e.key !== "Enter") return;
-
-      if (observerLock) return;
 
       const value = input.value.trim();
       if (!value) return;
@@ -451,7 +578,7 @@
           await loginSuccessSequence();
         } else {
           triggerGlitch();
-          await typeLine("> access denied", 16, "warn");
+          await typeLine("> access denied", 16);
           await sleep(250);
           await typeLine("username:", 18);
           stage = "login_user";
@@ -465,7 +592,7 @@
     });
 
     setInterval(async () => {
-      if (stage === "terminal" && commsUnlocked && Math.random() < 0.18 && !observerLock) {
+      if (stage === "terminal" && commsUnlocked && Math.random() < 0.18) {
         const line = document.createElement("div");
         line.className = "faint fade-in";
         line.textContent = randomCorrupt("> background noise detected");
@@ -474,6 +601,8 @@
       }
     }, 7000);
 
+boot();
+</script>
     setInterval(() => {
       if (Math.random() < 0.08) {
         triggerGlitch();
