@@ -9,21 +9,19 @@
       --bg: #000000;
       --fg: #00e995;
       --fg-dim: rgba(0, 233, 149, 0.62);
-      --fg-faint: rgba(0, 233, 149, 0.28);
+      --fg-faint: rgba(0, 233, 149, 0.26);
       --danger: #ff5a5a;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html, body {
       margin: 0;
       padding: 0;
+      min-height: 100%;
       background: var(--bg);
       color: var(--fg);
       font-family: monospace;
-      min-height: 100%;
       overflow-x: hidden;
     }
 
@@ -32,7 +30,6 @@
       padding: 18px;
     }
 
-    /* Subtle screen texture */
     body::before {
       content: "";
       position: fixed;
@@ -50,7 +47,6 @@
       z-index: 2;
     }
 
-    /* Soft vignette */
     body::after {
       content: "";
       position: fixed;
@@ -150,18 +146,17 @@
       text-shadow: 0 0 4px rgba(0, 233, 149, 0.22);
     }
 
+    #input:disabled {
+      opacity: 0.45;
+    }
+
     a {
       color: #7effca;
       text-decoration: underline;
     }
 
-    .faint {
-      color: var(--fg-faint);
-    }
-
-    .warn {
-      color: var(--danger);
-    }
+    .faint { color: var(--fg-faint); }
+    .warn { color: var(--danger); }
 
     .glitch {
       animation: glitchFlash 0.11s linear 3;
@@ -183,14 +178,6 @@
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
-    }
-
-    .blink {
-      animation: blink 1s step-end infinite;
-    }
-
-    @keyframes blink {
-      50% { opacity: 0; }
     }
   </style>
 </head>
@@ -216,15 +203,11 @@
     let stage = "login_user";
     let loginUser = "";
     let commsUnlocked = false;
+    let observerTriggered = false;
+    let observerLock = false;
 
     const SECOND_USER = "rain.wlr";
     const SECOND_PASS = "open.channel";
-    const PHONE_NUMBER = "+1 XXX XXX XXXX"; // REPLACE THIS
-    const FILE_LINKS = [
-      { label: "/files/archive_01.zip", href: "/files/archive_01.zip" },
-      { label: "/files/node_fragment.png", href: "/files/node_fragment.png" },
-      { label: "/files/audio_log_01.wav", href: "/files/audio_log_01.wav" }
-    ];
 
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
@@ -245,7 +228,7 @@
       const pool = ["▒", "▓", "░", "̴", "̵", "̷"];
       let out = "";
       for (const ch of text) {
-        if (ch !== " " && Math.random() < 0.06) {
+        if (ch !== " " && Math.random() < 0.07) {
           out += pool[Math.floor(Math.random() * pool.length)];
         } else {
           out += ch;
@@ -254,9 +237,9 @@
       return out;
     }
 
-    async function typeLine(text = "", speed = 16) {
+    async function typeLine(text = "", speed = 16, className = "") {
       const line = document.createElement("div");
-      line.className = "fade-in";
+      line.className = `fade-in ${className}`.trim();
       terminal.appendChild(line);
 
       for (let i = 0; i < text.length; i++) {
@@ -295,12 +278,12 @@
       triggerGlitch();
       await typeLine(randomCorrupt("> relay desync residuals detected"), 15);
       await sleep(300);
-      await typeLine("", 10);
+      await typeLine("");
       await typeLine("username:", 18);
     }
 
     async function loginSuccessSequence() {
-      await typeLine("", 10);
+      await typeLine("");
       await typeLine("> route accepted", 18);
       await sleep(400);
       triggerGlitch();
@@ -327,6 +310,7 @@
       await sleep(450);
       await typeLine("rain.wlr: type HELP.", 18);
       commsUnlocked = true;
+      scheduleObserverIntrusion();
     }
 
     async function glitchBurst() {
@@ -338,82 +322,115 @@
         randomCorrupt("> relay noise spike"),
         randomCorrupt("> packet loss rising")
       ];
-      await typeLine(bursts[Math.floor(Math.random() * bursts.length)], 10);
+      await typeLine(bursts[Math.floor(Math.random() * bursts.length)], 10, "faint");
+    }
+
+    function scheduleObserverIntrusion() {
+      const delayMs = 45000 + Math.floor(Math.random() * 15000);
+      setTimeout(async () => {
+        if (!commsUnlocked || observerTriggered) return;
+        observerTriggered = true;
+        observerLock = true;
+        input.disabled = true;
+
+        triggerGlitch();
+        await typeLine("", 10);
+        await typeLine(randomCorrupt("> unauthorized pattern detected"), 10, "warn");
+        await sleep(400);
+        triggerGlitch();
+        await typeLine(randomCorrupt("> process collision :: OBSERVER"), 9, "warn");
+        await sleep(700);
+        await typeLine("OBSERVER: you were not granted this route.", 18, "warn");
+        await sleep(600);
+        await typeLine("OBSERVER: this relay does not belong to you.", 18, "warn");
+        await sleep(700);
+        triggerGlitch();
+        await typeLine(randomCorrupt("rain.wlr: ignore it. do not respond to it directly."), 14);
+        await sleep(700);
+        await typeLine("OBSERVER: i can see the handshake residue.", 18, "warn");
+        await sleep(800);
+        await typeLine("> relay instability rising", 18);
+        await sleep(400);
+        await typeLine("> input restored", 18);
+
+        input.disabled = false;
+        input.focus();
+        observerLock = false;
+      }, delayMs);
     }
 
     async function handleCommsCommand(raw) {
-  const cmd = raw.toLowerCase().trim();
+      const cmd = raw.toLowerCase().trim();
 
-  if (!commsUnlocked) {
-    if (cmd === "connect") {
-      await openCommsSequence();
-      return;
+      if (!commsUnlocked) {
+        if (cmd === "connect") {
+          await openCommsSequence();
+          return;
+        }
+
+        await typeLine("> communications relay locked", 18);
+        await sleep(250);
+        await typeLine("> type CONNECT", 18);
+        return;
+      }
+
+      if (cmd === "help") {
+        await typeLine("commands:", 16);
+        await typeLine("STATUS", 16);
+        await typeLine("RAIN", 16);
+        await typeLine("DATA", 16);
+        await typeLine("OBSERVER", 16);
+        return;
+      }
+
+      if (cmd === "status") {
+        await typeLine("> relay integrity :: unstable", 16);
+        await sleep(200);
+        await typeLine("> watcher probability :: elevated", 16);
+        await sleep(200);
+        await typeLine("> route source :: allied", 16);
+        return;
+      }
+
+      if (cmd === "rain") {
+        await typeLine("rain.wlr: i opened the route, not the system.", 18);
+        await sleep(350);
+        await typeLine("rain.wlr: don’t assume i control what sees you now.", 18);
+        await sleep(350);
+        await typeLine("rain.wlr: take what you need and move.", 18);
+        return;
+      }
+
+      if (cmd === "data") {
+        await typeLine("rain.wlr: pushing files...", 18);
+        await sleep(700);
+        await typeHTMLLine(`<a href="/files/Op7-Data.rar" target="_blank">/files/Op7-Data.rar</a>`);
+        await sleep(250);
+        await typeHTMLLine(`<a href="/files/Remember-It.png" target="_blank">/files/Remember-It.png</a>`);
+        await sleep(400);
+        await typeLine("rain.wlr: do not linger here.", 18);
+        return;
+      }
+
+      if (cmd === "observer") {
+        triggerGlitch();
+        await typeLine(randomCorrupt("> do not name it unless necessary"), 12);
+        await sleep(400);
+        await typeLine("rain.wlr: it listens for patterns.", 18);
+        return;
+      }
+
+      if (Math.random() < 0.35) {
+        await glitchBurst();
+      }
+
+      await typeLine("> command not recognized", 18);
     }
-
-    await typeLine("> communications relay locked", 18);
-    await sleep(250);
-    await typeLine("> type CONNECT", 18);
-    return;
-  }
-
-  if (cmd === "help") {
-    await typeLine("commands:", 16);
-    await typeLine("STATUS", 16);
-    await typeLine("RAIN", 16);
-    await typeLine("DATA", 16);
-    await typeLine("OBSERVER", 16);
-    return;
-  }
-
-  else if (cmd === "status") {
-    await typeLine("> relay integrity :: unstable", 16);
-    await sleep(200);
-    await typeLine("> watcher probability :: elevated", 16);
-    await sleep(200);
-    await typeLine("> route source :: allied", 16);
-    return;
-  }
-
-  else if (cmd === "rain") {
-    await typeLine("rain.wlr: i opened the route, not the system.", 18);
-    await sleep(350);
-    await typeLine("rain.wlr: don’t assume i control what sees you now.", 18);
-    await sleep(350);
-    await typeLine("rain.wlr: take what you need and move.", 18);
-    return;
-  }
-
-  else if (cmd === "data") {
-    await typeLine("rain.wlr: pushing files...", 18);
-    await sleep(700);
-
-    await typeHTMLLine(`<a href="/files/Op7-Data.rar" target="_blank">/files/Op7-Data.rar</a>`);
-    await sleep(250);
-    await typeHTMLLine(`<a href="/files/Remember-It.png" target="_blank">/files/Remember-It.png</a>`);
-
-    await sleep(400);
-    await typeLine("rain.wlr: do not linger here.", 18);
-    return;
-  }
-
-  else if (cmd === "observer") {
-    triggerGlitch();
-    await typeLine(randomCorrupt("> do not name it unless necessary"), 12);
-    await sleep(400);
-    await typeLine("rain.wlr: it listens for patterns.", 18);
-    return;
-  }
-
-  else {
-    if (Math.random() < 0.35) {
-      await glitchBurst();
-    }
-
-    await typeLine("> command not recognized", 18);
-  }
 
     input.addEventListener("keydown", async (e) => {
       if (e.key !== "Enter") return;
+
+      if (observerLock) return;
 
       const value = input.value.trim();
       if (!value) return;
@@ -434,7 +451,7 @@
           await loginSuccessSequence();
         } else {
           triggerGlitch();
-          await typeLine("> access denied", 16);
+          await typeLine("> access denied", 16, "warn");
           await sleep(250);
           await typeLine("username:", 18);
           stage = "login_user";
@@ -448,7 +465,7 @@
     });
 
     setInterval(async () => {
-      if (stage === "terminal" && commsUnlocked && Math.random() < 0.18) {
+      if (stage === "terminal" && commsUnlocked && Math.random() < 0.18 && !observerLock) {
         const line = document.createElement("div");
         line.className = "faint fade-in";
         line.textContent = randomCorrupt("> background noise detected");
