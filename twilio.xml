@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
+  <Pause length="1"/>
   <Play>https://vonrosa-6065.twil.io/vm4.wav</Play>
 </Response>
