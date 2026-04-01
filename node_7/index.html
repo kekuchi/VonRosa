@@ -341,106 +341,162 @@
       await typeLine(bursts[Math.floor(Math.random() * bursts.length)], 10);
     }
 
-    async function handleCommsCommand(raw) {
-      const cmd = raw.toLowerCase().trim();
+    let state = {
+  greeted: false,
+  warned: false,
+  dataGiven: false,
+  logsSeen: false,
+  traceLevel: 0,
+  instability: 0
+};
 
-      if (!commsUnlocked) {
-        if (cmd === "connect") {
-          await openCommsSequence();
-          return;
-        }
+async function handleCommsCommand(raw) {
+  const cmd = raw.toLowerCase().trim();
 
-        await typeLine("> communications relay locked", 18);
-        await sleep(250);
-        await typeLine("> type CONNECT", 18);
-        return;
-      }
-
-      if (cmd === "help") {
-        await typeLine("commands:", 16);
-        await typeLine("STATUS", 16);
-        await typeLine("RAIN", 16);
-        await typeLine("VOICE", 16);
-        await typeLine("FILES", 16);
-        await typeLine("PACKAGE", 16);
-        await typeLine("OBSERVER", 16);
-        await typeLine("SECTOR965", 16);
-        return;
-      }
-
-      if (cmd === "status") {
-        await typeLine("> relay integrity :: unstable", 16);
-        await sleep(220);
-        await typeLine("> watcher probability :: elevated", 16);
-        await sleep(220);
-        await typeLine("> route source :: allied", 16);
-        return;
-      }
-
-      if (cmd === "rain") {
-        await typeLine("rain.wlr: i opened the route, not the system.", 18);
-        await sleep(350);
-        await typeLine("rain.wlr: don’t assume i control what sees you now.", 18);
-        return;
-      }
-
-      if (cmd === "voice") {
-        await typeLine("rain.wlr: text channel degrading...", 18);
-        await sleep(500);
-        await typeLine("rain.wlr: they watch text faster than voice.", 18);
-        await sleep(500);
-        await typeLine("rain.wlr: use alternate relay:", 18);
-        await sleep(450);
-        await typeLine(PHONE_NUMBER, 18);
-        return;
-      }
-
-      if (cmd === "files") {
-        await typeLine("rain.wlr: available transfers:", 18);
-        await sleep(300);
-
-        for (const file of FILE_LINKS) {
-          await typeHTMLLine(`<a href="${file.href}" target="_blank">${file.label}</a>`);
-          await sleep(120);
-        }
-        return;
-      }
-
-      if (cmd === "package") {
-        await typeLine("rain.wlr: transmitting package...", 18);
-        await sleep(900);
-        triggerGlitch();
-        await typeLine("> transfer complete", 18);
-        await typeHTMLLine(`<a href="/files/package_alpha.rar" target="_blank">/files/package_alpha.rar</a>`);
-        return;
-      }
-
-      if (cmd === "observer") {
-        triggerGlitch();
-        await typeLine(randomCorrupt("> do not name it unless necessary"), 12);
-        await sleep(400);
-        await typeLine("rain.wlr: it listens for patterns.", 18);
-        return;
-      }
-
-      if (cmd === "sector965") {
-        await typeLine("rain.wlr: sector 965 responded when it should have remained silent.", 18);
-        await sleep(450);
-        await typeLine("rain.wlr: that is why this route exists.", 18);
-        return;
-      }
-
-      if (cmd === "clear") {
-        terminal.innerHTML = "";
-        return;
-      }
-
-      if (Math.random() < 0.35) {
-        await glitchBurst();
-      }
-
-      await typeLine("> command not recognized", 18);
+  if (!commsUnlocked) {
+    if (cmd === "connect") {
+      await openCommsSequence();
+      return;
     }
+
+    await typeLine("> communications relay locked", 16);
+    await typeLine("> type CONNECT", 16);
+    return;
+  }
+
+  if (!state.greeted) {
+    state.greeted = true;
+
+    await typeLine("rain.wlr: ...you shouldn't be here.", 16);
+    await sleep(500);
+    await typeLine("rain.wlr: but since you are, listen carefully.", 16);
+    await sleep(500);
+    await typeLine("rain.wlr: do not trigger anything you don't understand.", 16);
+  }
+
+  if (cmd === "help") {
+    await typeLine("available:", 16);
+    await typeLine("STATUS  :: system condition", 16);
+    await typeLine("DATA    :: retrieve files", 16);
+    await typeLine("LOGS    :: recent activity", 16);
+    await typeLine("TRACE   :: check exposure level", 16);
+    await typeLine("RAIN    :: direct channel", 16);
+    await typeLine("EXIT    :: terminate session", 16);
+    return;
+  }
+
+  if (cmd === "status") {
+    await typeLine("> relay integrity :: unstable", 16);
+    await sleep(300);
+    await typeLine("> trace risk :: " + (state.traceLevel > 2 ? "HIGH" : "MODERATE"), 16);
+
+    if (!state.warned) {
+      state.warned = true;
+      await sleep(400);
+      await typeLine("rain.wlr: you're lingering.", 16);
+    }
+
+    return;
+  }
+
+  if (cmd === "data") {
+    if (!state.dataGiven) {
+      state.dataGiven = true;
+
+      await typeLine("rain.wlr: sending...", 16);
+      await sleep(800);
+
+      await typeHTMLLine(`<a href="/files/Op7-Data.rar" target="_blank">/files/Op7-Data.rar</a>`);
+      await sleep(300);
+      await typeHTMLLine(`<a href="/files/Remember-It.png" target="_blank">/files/Remember-It.png</a>`);
+
+      await sleep(500);
+      await typeLine("rain.wlr: that's everything i could pull.", 16);
+    } else {
+      await typeLine("rain.wlr: you already have it.", 16);
+    }
+
+    return;
+  }
+
+  if (cmd === "logs") {
+    state.logsSeen = true;
+
+    await typeLine("> retrieving logs...", 16);
+    await sleep(500);
+
+    await typeLine("> node_7 breach detected", 16);
+    await typeLine("> unauthorized relay opened", 16);
+    await typeLine("> observer ping detected", 16);
+
+    state.traceLevel++;
+
+    return;
+  }
+
+  if (cmd === "trace") {
+    await typeLine("> trace level :: " + state.traceLevel, 16);
+
+    if (state.traceLevel >= 3) {
+      await sleep(400);
+      await typeLine("rain.wlr: they're getting closer.", 16);
+    }
+
+    async function triggerObserverKill() {
+  triggerGlitch();
+
+  await typeLine(randomCorrupt("> unauthorized reference detected"), 10);
+  await sleep(400);
+
+  await typeLine("OBSERVER: you were not invited.", 16);
+  await sleep(700);
+
+  await typeLine("> trace spike detected", 16);
+  await sleep(500);
+
+  await typeLine("> connection overridden", 16);
+  await sleep(500);
+
+  await typeLine("> terminating...", 16);
+  await sleep(800);
+
+  input.disabled = true;
+
+  await sleep(1500);
+
+  window.location.href = "/";
+}
+    
+    return;
+  }
+
+  if (cmd === "rain") {
+    await typeLine("rain.wlr: i don't have long.", 16);
+    await sleep(400);
+    await typeLine("rain.wlr: this system isn't supposed to be accessed externally.", 16);
+    return;
+  }
+
+  if (cmd === "exit") {
+    await typeLine("> closing channel...", 16);
+    await sleep(800);
+    window.location.href = "/";
+    return;
+  }
+
+  if (cmd.includes("observer")) {
+    triggerObserverKill();
+    return;
+  }
+
+  if (Math.random() < 0.25) {
+    triggerGlitch();
+    await typeLine(randomCorrupt("> signal disturbance"), 10);
+    state.traceLevel++;
+  }
+
+  await typeLine("> command not recognized", 16);
+}
 
     input.addEventListener("keydown", async (e) => {
       if (e.key !== "Enter") return;
