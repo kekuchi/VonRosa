@@ -464,15 +464,140 @@
       .brand-title { font-size: 1rem; }
       .container { width: min(1180px, calc(100% - 22px)); }
     }
+
+  /* ===== ENTRY EXPERIENCE ===== */
+
+#entry-screen {
+  position: fixed;
+  inset: 0;
+  background: black;
+  z-index: 999999;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#entry-black {
+  position: absolute;
+  inset: 0;
+  background: black;
+  z-index: 1;
+}
+
+#video-desktop,
+#video-mobile {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: black;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  z-index: 2;
+}
+
+#video-desktop.show,
+#video-mobile.show {
+  opacity: 1;
+}
+
+#video-mobile {
+  display: none;
+}
+
+#entry-logo-wrap {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+#entry-logo-wrap.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#entry-logo {
+  width: min(42vw, 320px);
+  max-width: 80vw;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 0 14px rgba(255, 0, 60, 0.15));
+}
+
+#core-button {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 64px;
+  height: 64px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+#entry-screen.fade-out {
+  opacity: 0;
+  transition: opacity 1s ease;
+  pointer-events: none;
+}
+
+#entry-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at center, transparent 55%, rgba(0,0,0,0.35) 100%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+@media (max-width: 720px) {
+  #video-desktop {
+    display: none;
+  }
+
+  #video-mobile {
+    display: block;
+  }
+
+  #entry-logo {
+    width: min(68vw, 260px);
+  }
+
+  #core-button {
+    width: 58px;
+    height: 58px;
+  }
+}
   </style>
 </head>
 <body>
 
-    <div id="intro-overlay">
-        <video id="intro-video" autoplay muted playsinline>
-            <source src="/assets/intro.mp4" type="video/mp4">
-        </video>
-    </div>
+    <div id="entry-screen">
+  <div id="entry-black"></div>
+
+  <video id="video-desktop" muted playsinline preload="auto">
+    <source src="/assets/intro-desktop.mp4" type="video/mp4">
+  </video>
+
+  <video id="video-mobile" muted playsinline preload="auto">
+    <source src="/assets/intro-mobile.mp4" type="video/mp4">
+  </video>
+
+  <div id="entry-logo-wrap">
+    <img id="entry-logo" src="/assets/logo.png" alt="VonRosa Logo">
+    <button id="core-button" aria-label="Enter VonRosa"></button>
+  </div>
+</div>
   
   <header class="topbar">
     <div class="container topbar-inner">
@@ -709,5 +834,67 @@
       <small>Unauthorized interaction may be logged</small>
     </div>
   </footer>
+
+<script>
+  const entryScreen = document.getElementById("entry-screen");
+  const entryLogoWrap = document.getElementById("entry-logo-wrap");
+  const coreButton = document.getElementById("core-button");
+  const desktopVideo = document.getElementById("video-desktop");
+  const mobileVideo = document.getElementById("video-mobile");
+
+  const isMobile = window.matchMedia("(max-width: 720px)").matches;
+  const activeVideo = isMobile ? mobileVideo : desktopVideo;
+
+  let logoShown = false;
+
+  function showLogo() {
+    if (logoShown) return;
+    logoShown = true;
+    entryLogoWrap.classList.add("show");
+  }
+
+  function closeEntry() {
+    entryScreen.classList.add("fade-out");
+    setTimeout(() => {
+      entryScreen.remove();
+    }, 1000);
+  }
+
+  function revealVideo() {
+    if (activeVideo) {
+      activeVideo.classList.add("show");
+    }
+  }
+
+  if (activeVideo) {
+    activeVideo.addEventListener("canplay", () => {
+      revealVideo();
+      activeVideo.play().catch(() => {
+        revealVideo();
+      });
+    });
+
+    activeVideo.addEventListener("ended", () => {
+      showLogo();
+    });
+
+    setTimeout(() => {
+      revealVideo();
+    }, 1200);
+
+    setTimeout(() => {
+      showLogo();
+    }, 11000);
+  } else {
+    setTimeout(() => {
+      showLogo();
+    }, 1500);
+  }
+
+  coreButton.addEventListener("click", () => {
+    closeEntry();
+  });
+</script>
+  
 </body>
 </html>
