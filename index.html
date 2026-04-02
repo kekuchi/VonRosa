@@ -595,6 +595,81 @@
 </head>
 <body>
 
+  <!-- 🔐 PASSWORD GATE -->
+<div id="gate">
+  <div id="gate-box">
+    <h2>ACCESS REQUIRED</h2>
+    <input type="password" id="gate-pass" placeholder="Enter password" />
+    <button onclick="unlock()">ENTER</button>
+    <p id="gate-error"></p>
+  </div>
+</div>
+
+<style>
+#gate {
+  position: fixed;
+  inset: 0;
+  background: black;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#gate-box {
+  text-align: center;
+  color: white;
+  font-family: monospace;
+}
+
+#gate input {
+  padding: 10px;
+  margin-top: 10px;
+  width: 200px;
+  background: black;
+  border: 1px solid #555;
+  color: white;
+}
+
+#gate button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #111;
+  border: 1px solid #555;
+  color: white;
+  cursor: pointer;
+}
+
+#gate-error {
+  color: red;
+  margin-top: 10px;
+  font-size: 12px;
+}
+</style>
+
+<script>
+const PASSWORD = "miasma7382!"; // 🔑 CHANGE THIS
+
+function unlock() {
+  const input = document.getElementById("gate-pass").value;
+
+  if (input === PASSWORD) {
+    sessionStorage.setItem("access_granted", "true");
+    document.getElementById("gate").style.display = "none";
+  } else {
+    document.getElementById("gate-error").innerText = "ACCESS DENIED";
+  }
+}
+
+// keep unlocked during session
+if (sessionStorage.getItem("access_granted") === "true") {
+  window.addEventListener("load", () => {
+    const gate = document.getElementById("gate");
+    if (gate) gate.style.display = "none";
+  });
+}
+</script>
+  
     <div id="entry-screen">
   <div id="entry-black"></div>
 
