@@ -641,7 +641,7 @@
   <div id="gate-box">
     <h2>ACCESS REQUIRED</h2>
     <input type="password" id="gate-pass" placeholder="Enter password" />
-    <button id="gate-btn" onclick="unlock()">ENTER</button>
+    <button id="gate-btn" onclick="if(document.getElementById('gate-pass').value==='miasma'){sessionStorage.setItem('access_granted','true');document.getElementById('gate').style.display='none';}else{document.getElementById('gate-error').innerText='ACCESS DENIED';}">ENTER</button>
     <p id="gate-error"></p>
   </div>
 </div>
